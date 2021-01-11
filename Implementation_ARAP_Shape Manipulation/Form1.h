@@ -30,6 +30,8 @@ ArapInteractor    *Arap=NULL;
 
 int		  flag=-1;
 int		  mouseX,mouseY;
+extern int step1_only;
+extern int show_fitted;
 
 struct Mode_Display {
 	bool openImg;
@@ -85,12 +87,13 @@ namespace As_rigid_as_test {
 	private: System::Windows::Forms::Button^  button2;
 	private: System::Windows::Forms::Button^  button3;
 	private: System::Windows::Forms::Button^ animation;
-	private: System::Windows::Forms::CheckBox^ fit;
+
 	private: System::Windows::Forms::CheckBox^ depth;
 	private: System::Windows::Forms::CheckBox^ weight;
 	private: System::Windows::Forms::CheckBox^ curve;
 	private: System::Windows::Forms::CheckBox^ peekinginterface;
 	private: System::Windows::Forms::CheckBox^ Scale;
+	private: System::Windows::Forms::CheckBox^ fit;
 
 
 	private: System::ComponentModel::IContainer^  components;
@@ -108,33 +111,33 @@ namespace As_rigid_as_test {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			HKOGLPanel::HKCOGLPanelCameraSetting^ hkcoglPanelCameraSetting2 = (gcnew HKOGLPanel::HKCOGLPanelCameraSetting());
-			HKOGLPanel::HKCOGLPanelPixelFormat^ hkcoglPanelPixelFormat2 = (gcnew HKOGLPanel::HKCOGLPanelPixelFormat());
+			HKOGLPanel::HKCOGLPanelCameraSetting^ hkcoglPanelCameraSetting1 = (gcnew HKOGLPanel::HKCOGLPanelCameraSetting());
+			HKOGLPanel::HKCOGLPanelPixelFormat^ hkcoglPanelPixelFormat1 = (gcnew HKOGLPanel::HKCOGLPanelPixelFormat());
 			this->hkoglPanelControl1 = (gcnew HKOGLPanel::HKOGLPanelControl());
 			this->button2 = (gcnew System::Windows::Forms::Button());
 			this->button3 = (gcnew System::Windows::Forms::Button());
 			this->animation = (gcnew System::Windows::Forms::Button());
-			this->fit = (gcnew System::Windows::Forms::CheckBox());
 			this->depth = (gcnew System::Windows::Forms::CheckBox());
 			this->weight = (gcnew System::Windows::Forms::CheckBox());
 			this->curve = (gcnew System::Windows::Forms::CheckBox());
 			this->peekinginterface = (gcnew System::Windows::Forms::CheckBox());
 			this->Scale = (gcnew System::Windows::Forms::CheckBox());
+			this->fit = (gcnew System::Windows::Forms::CheckBox());
 			this->SuspendLayout();
 			// 
 			// hkoglPanelControl1
 			// 
-			hkcoglPanelCameraSetting2->Far = 1000;
-			hkcoglPanelCameraSetting2->Fov = 45;
-			hkcoglPanelCameraSetting2->Near = -1000;
-			hkcoglPanelCameraSetting2->Type = HKOGLPanel::HKCOGLPanelCameraSetting::CAMERATYPE::ORTHOGRAPHIC;
-			this->hkoglPanelControl1->Camera_Setting = hkcoglPanelCameraSetting2;
+			hkcoglPanelCameraSetting1->Far = 1000;
+			hkcoglPanelCameraSetting1->Fov = 45;
+			hkcoglPanelCameraSetting1->Near = -1000;
+			hkcoglPanelCameraSetting1->Type = HKOGLPanel::HKCOGLPanelCameraSetting::CAMERATYPE::ORTHOGRAPHIC;
+			this->hkoglPanelControl1->Camera_Setting = hkcoglPanelCameraSetting1;
 			this->hkoglPanelControl1->Location = System::Drawing::Point(136, 13);
 			this->hkoglPanelControl1->Name = L"hkoglPanelControl1";
-			hkcoglPanelPixelFormat2->Accumu_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
-			hkcoglPanelPixelFormat2->Alpha_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
-			hkcoglPanelPixelFormat2->Stencil_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
-			this->hkoglPanelControl1->Pixel_Format = hkcoglPanelPixelFormat2;
+			hkcoglPanelPixelFormat1->Accumu_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
+			hkcoglPanelPixelFormat1->Alpha_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
+			hkcoglPanelPixelFormat1->Stencil_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
+			this->hkoglPanelControl1->Pixel_Format = hkcoglPanelPixelFormat1;
 			this->hkoglPanelControl1->Size = System::Drawing::Size(734, 682);
 			this->hkoglPanelControl1->TabIndex = 9;
 			this->hkoglPanelControl1->Load += gcnew System::EventHandler(this, &Form1::hkoglPanelControl1_Load);
@@ -171,17 +174,6 @@ namespace As_rigid_as_test {
 			this->animation->TabIndex = 13;
 			this->animation->Text = L"animation";
 			this->animation->UseVisualStyleBackColor = true;
-			// 
-			// fit
-			// 
-			this->fit->AutoSize = true;
-			this->fit->Location = System::Drawing::Point(13, 316);
-			this->fit->Name = L"fit";
-			this->fit->Size = System::Drawing::Size(34, 16);
-			this->fit->TabIndex = 14;
-			this->fit->Text = L"fit";
-			this->fit->UseVisualStyleBackColor = true;
-			this->fit->CheckedChanged += gcnew System::EventHandler(this, &Form1::fit_CheckedChanged);
 			// 
 			// depth
 			// 
@@ -226,13 +218,26 @@ namespace As_rigid_as_test {
 			// Scale
 			// 
 			this->Scale->AutoSize = true;
-			this->Scale->Location = System::Drawing::Point(71, 316);
+			this->Scale->Checked = true;
+			this->Scale->CheckState = System::Windows::Forms::CheckState::Checked;
+			this->Scale->Location = System::Drawing::Point(82, 316);
 			this->Scale->Name = L"Scale";
-			this->Scale->Size = System::Drawing::Size(48, 16);
+			this->Scale->Size = System::Drawing::Size(46, 16);
 			this->Scale->TabIndex = 19;
-			this->Scale->Text = L"Scale";
+			this->Scale->Text = L"scale";
 			this->Scale->UseVisualStyleBackColor = true;
 			this->Scale->CheckedChanged += gcnew System::EventHandler(this, &Form1::Scale_CheckedChanged);
+			// 
+			// fit
+			// 
+			this->fit->AutoSize = true;
+			this->fit->Location = System::Drawing::Point(13, 316);
+			this->fit->Name = L"fit";
+			this->fit->Size = System::Drawing::Size(61, 16);
+			this->fit->TabIndex = 14;
+			this->fit->Text = L"show fit";
+			this->fit->UseVisualStyleBackColor = true;
+			this->fit->CheckedChanged += gcnew System::EventHandler(this, &Form1::fit_CheckedChanged);
 			// 
 			// Form1
 			// 
@@ -372,10 +377,12 @@ private: System::Void button3_Click(System::Object^  sender, System::EventArgs^ 
 		 hkoglPanelControl1->Invalidate();
 	 }
 private: System::Void fit_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
-	Arap->OnKeyboard('f', 0.05, 0.05);
+	// Arap->OnKeyboard('f', 0.05, 0.05);
+	show_fitted = this->fit->Checked;
 }
 private: System::Void Scale_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
 	Arap->OnKeyboard('1',1,1 );
+	step1_only = !this->Scale->Checked;
 }
 };
 }

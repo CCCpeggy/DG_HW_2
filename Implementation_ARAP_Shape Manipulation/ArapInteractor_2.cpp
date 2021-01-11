@@ -17,7 +17,7 @@ using namespace std;
 // read that Igarashi's paper first :)
 
 int step1_only = false;
-int show_fitted = true;
+int show_fitted = false;
 
 #define ARAP_DO_VERIFY	0
 
