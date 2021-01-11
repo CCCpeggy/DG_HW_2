@@ -84,6 +84,12 @@ namespace As_rigid_as_test {
 
 	private: System::Windows::Forms::Button^  button2;
 	private: System::Windows::Forms::Button^  button3;
+	private: System::Windows::Forms::Button^ animation;
+	private: System::Windows::Forms::CheckBox^ fit;
+	private: System::Windows::Forms::CheckBox^ depth;
+	private: System::Windows::Forms::CheckBox^ weight;
+	private: System::Windows::Forms::CheckBox^ curve;
+	private: System::Windows::Forms::CheckBox^ peekinginterface;
 
 	private: System::ComponentModel::IContainer^  components;
 
@@ -100,11 +106,17 @@ namespace As_rigid_as_test {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			HKOGLPanel::HKCOGLPanelCameraSetting^  hkcoglPanelCameraSetting1 = (gcnew HKOGLPanel::HKCOGLPanelCameraSetting());
-			HKOGLPanel::HKCOGLPanelPixelFormat^  hkcoglPanelPixelFormat1 = (gcnew HKOGLPanel::HKCOGLPanelPixelFormat());
+			HKOGLPanel::HKCOGLPanelCameraSetting^ hkcoglPanelCameraSetting1 = (gcnew HKOGLPanel::HKCOGLPanelCameraSetting());
+			HKOGLPanel::HKCOGLPanelPixelFormat^ hkcoglPanelPixelFormat1 = (gcnew HKOGLPanel::HKCOGLPanelPixelFormat());
 			this->hkoglPanelControl1 = (gcnew HKOGLPanel::HKOGLPanelControl());
 			this->button2 = (gcnew System::Windows::Forms::Button());
 			this->button3 = (gcnew System::Windows::Forms::Button());
+			this->animation = (gcnew System::Windows::Forms::Button());
+			this->fit = (gcnew System::Windows::Forms::CheckBox());
+			this->depth = (gcnew System::Windows::Forms::CheckBox());
+			this->weight = (gcnew System::Windows::Forms::CheckBox());
+			this->curve = (gcnew System::Windows::Forms::CheckBox());
+			this->peekinginterface = (gcnew System::Windows::Forms::CheckBox());
 			this->SuspendLayout();
 			// 
 			// hkoglPanelControl1
@@ -148,11 +160,76 @@ namespace As_rigid_as_test {
 			this->button3->UseVisualStyleBackColor = true;
 			this->button3->Click += gcnew System::EventHandler(this, &Form1::button3_Click);
 			// 
+			// animation
+			// 
+			this->animation->Location = System::Drawing::Point(13, 255);
+			this->animation->Name = L"animation";
+			this->animation->Size = System::Drawing::Size(117, 46);
+			this->animation->TabIndex = 13;
+			this->animation->Text = L"animation";
+			this->animation->UseVisualStyleBackColor = true;
+			// 
+			// fit
+			// 
+			this->fit->AutoSize = true;
+			this->fit->Location = System::Drawing::Point(13, 316);
+			this->fit->Name = L"fit";
+			this->fit->Size = System::Drawing::Size(34, 16);
+			this->fit->TabIndex = 14;
+			this->fit->Text = L"fit";
+			this->fit->UseVisualStyleBackColor = true;
+			// 
+			// depth
+			// 
+			this->depth->AutoSize = true;
+			this->depth->Location = System::Drawing::Point(12, 380);
+			this->depth->Name = L"depth";
+			this->depth->Size = System::Drawing::Size(50, 16);
+			this->depth->TabIndex = 15;
+			this->depth->Text = L"depth";
+			this->depth->UseVisualStyleBackColor = true;
+			// 
+			// weight
+			// 
+			this->weight->AutoSize = true;
+			this->weight->Location = System::Drawing::Point(13, 349);
+			this->weight->Name = L"weight";
+			this->weight->Size = System::Drawing::Size(55, 16);
+			this->weight->TabIndex = 16;
+			this->weight->Text = L"weight";
+			this->weight->UseVisualStyleBackColor = true;
+			// 
+			// curve
+			// 
+			this->curve->AutoSize = true;
+			this->curve->Location = System::Drawing::Point(12, 415);
+			this->curve->Name = L"curve";
+			this->curve->Size = System::Drawing::Size(50, 16);
+			this->curve->TabIndex = 17;
+			this->curve->Text = L"curve";
+			this->curve->UseVisualStyleBackColor = true;
+			// 
+			// peekinginterface
+			// 
+			this->peekinginterface->AutoSize = true;
+			this->peekinginterface->Location = System::Drawing::Point(13, 452);
+			this->peekinginterface->Name = L"peekinginterface";
+			this->peekinginterface->Size = System::Drawing::Size(104, 16);
+			this->peekinginterface->TabIndex = 18;
+			this->peekinginterface->Text = L"peeking interface";
+			this->peekinginterface->UseVisualStyleBackColor = true;
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 12);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(887, 707);
+			this->Controls->Add(this->peekinginterface);
+			this->Controls->Add(this->curve);
+			this->Controls->Add(this->weight);
+			this->Controls->Add(this->depth);
+			this->Controls->Add(this->fit);
+			this->Controls->Add(this->animation);
 			this->Controls->Add(this->button3);
 			this->Controls->Add(this->button2);
 			this->Controls->Add(this->hkoglPanelControl1);
@@ -160,6 +237,7 @@ namespace As_rigid_as_test {
 			this->Text = L"As rigid as possible shape manipulation";
 			this->Load += gcnew System::EventHandler(this, &Form1::Form1_Load);
 			this->ResumeLayout(false);
+			this->PerformLayout();
 
 		}
 #pragma endregion
