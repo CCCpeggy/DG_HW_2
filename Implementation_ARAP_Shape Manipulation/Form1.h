@@ -90,6 +90,8 @@ namespace As_rigid_as_test {
 	private: System::Windows::Forms::CheckBox^ weight;
 	private: System::Windows::Forms::CheckBox^ curve;
 	private: System::Windows::Forms::CheckBox^ peekinginterface;
+	private: System::Windows::Forms::CheckBox^ Scale;
+
 
 	private: System::ComponentModel::IContainer^  components;
 
@@ -106,8 +108,8 @@ namespace As_rigid_as_test {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			HKOGLPanel::HKCOGLPanelCameraSetting^ hkcoglPanelCameraSetting1 = (gcnew HKOGLPanel::HKCOGLPanelCameraSetting());
-			HKOGLPanel::HKCOGLPanelPixelFormat^ hkcoglPanelPixelFormat1 = (gcnew HKOGLPanel::HKCOGLPanelPixelFormat());
+			HKOGLPanel::HKCOGLPanelCameraSetting^ hkcoglPanelCameraSetting2 = (gcnew HKOGLPanel::HKCOGLPanelCameraSetting());
+			HKOGLPanel::HKCOGLPanelPixelFormat^ hkcoglPanelPixelFormat2 = (gcnew HKOGLPanel::HKCOGLPanelPixelFormat());
 			this->hkoglPanelControl1 = (gcnew HKOGLPanel::HKOGLPanelControl());
 			this->button2 = (gcnew System::Windows::Forms::Button());
 			this->button3 = (gcnew System::Windows::Forms::Button());
@@ -117,21 +119,22 @@ namespace As_rigid_as_test {
 			this->weight = (gcnew System::Windows::Forms::CheckBox());
 			this->curve = (gcnew System::Windows::Forms::CheckBox());
 			this->peekinginterface = (gcnew System::Windows::Forms::CheckBox());
+			this->Scale = (gcnew System::Windows::Forms::CheckBox());
 			this->SuspendLayout();
 			// 
 			// hkoglPanelControl1
 			// 
-			hkcoglPanelCameraSetting1->Far = 1000;
-			hkcoglPanelCameraSetting1->Fov = 45;
-			hkcoglPanelCameraSetting1->Near = -1000;
-			hkcoglPanelCameraSetting1->Type = HKOGLPanel::HKCOGLPanelCameraSetting::CAMERATYPE::ORTHOGRAPHIC;
-			this->hkoglPanelControl1->Camera_Setting = hkcoglPanelCameraSetting1;
+			hkcoglPanelCameraSetting2->Far = 1000;
+			hkcoglPanelCameraSetting2->Fov = 45;
+			hkcoglPanelCameraSetting2->Near = -1000;
+			hkcoglPanelCameraSetting2->Type = HKOGLPanel::HKCOGLPanelCameraSetting::CAMERATYPE::ORTHOGRAPHIC;
+			this->hkoglPanelControl1->Camera_Setting = hkcoglPanelCameraSetting2;
 			this->hkoglPanelControl1->Location = System::Drawing::Point(136, 13);
 			this->hkoglPanelControl1->Name = L"hkoglPanelControl1";
-			hkcoglPanelPixelFormat1->Accumu_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
-			hkcoglPanelPixelFormat1->Alpha_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
-			hkcoglPanelPixelFormat1->Stencil_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
-			this->hkoglPanelControl1->Pixel_Format = hkcoglPanelPixelFormat1;
+			hkcoglPanelPixelFormat2->Accumu_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
+			hkcoglPanelPixelFormat2->Alpha_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
+			hkcoglPanelPixelFormat2->Stencil_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
+			this->hkoglPanelControl1->Pixel_Format = hkcoglPanelPixelFormat2;
 			this->hkoglPanelControl1->Size = System::Drawing::Size(734, 682);
 			this->hkoglPanelControl1->TabIndex = 9;
 			this->hkoglPanelControl1->Load += gcnew System::EventHandler(this, &Form1::hkoglPanelControl1_Load);
@@ -178,6 +181,7 @@ namespace As_rigid_as_test {
 			this->fit->TabIndex = 14;
 			this->fit->Text = L"fit";
 			this->fit->UseVisualStyleBackColor = true;
+			this->fit->CheckedChanged += gcnew System::EventHandler(this, &Form1::fit_CheckedChanged);
 			// 
 			// depth
 			// 
@@ -219,11 +223,23 @@ namespace As_rigid_as_test {
 			this->peekinginterface->Text = L"peeking interface";
 			this->peekinginterface->UseVisualStyleBackColor = true;
 			// 
+			// Scale
+			// 
+			this->Scale->AutoSize = true;
+			this->Scale->Location = System::Drawing::Point(71, 316);
+			this->Scale->Name = L"Scale";
+			this->Scale->Size = System::Drawing::Size(48, 16);
+			this->Scale->TabIndex = 19;
+			this->Scale->Text = L"Scale";
+			this->Scale->UseVisualStyleBackColor = true;
+			this->Scale->CheckedChanged += gcnew System::EventHandler(this, &Form1::Scale_CheckedChanged);
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 12);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(887, 707);
+			this->Controls->Add(this->Scale);
 			this->Controls->Add(this->peekinginterface);
 			this->Controls->Add(this->curve);
 			this->Controls->Add(this->weight);
@@ -355,6 +371,12 @@ private: System::Void button3_Click(System::Object^  sender, System::EventArgs^ 
 		 }
 		 hkoglPanelControl1->Invalidate();
 	 }
+private: System::Void fit_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
+	Arap->OnKeyboard('f', 0.05, 0.05);
+}
+private: System::Void Scale_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
+	Arap->OnKeyboard('1',1,1 );
+}
 };
 }
 
