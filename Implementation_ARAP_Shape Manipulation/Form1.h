@@ -12,6 +12,7 @@
 #include <time.h>
 
 #include <iostream>
+#include <fstream>
 #include <gl/GL.h>
 #include <gl/GLU.h>
 #include <gl/glut.h>
@@ -224,7 +225,6 @@ namespace As_rigid_as_test {
 			// 
 			// start_anime
 			// 
-			this->start_anime->Enabled = actions.size() > 0;
 			this->start_anime->Font = (gcnew System::Drawing::Font(L"新細明體", 15));
 			this->start_anime->Location = System::Drawing::Point(12, 271);
 			this->start_anime->Name = L"start_anime";
@@ -273,6 +273,7 @@ namespace As_rigid_as_test {
 			this->Controls->Add(this->hkoglPanelControl1);
 			this->Name = L"Form1";
 			this->Text = L"As rigid as possible shape manipulation";
+			this->Load += gcnew System::EventHandler(this, &Form1::Form1_Load);
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -346,7 +347,7 @@ namespace As_rigid_as_test {
 	}
 private: System::Void button2_Click_1(System::Object^ sender, System::EventArgs^ e) {//open image 
 		Current_Display.openImg = 1;
-		ImageEdge->ReadImage("gingerbread_man.bmp");
+		ImageEdge->ReadImage("full_guys_mask.png");
 		*ImageEdge = (ImageEdge->CannyEdge());
 
 		std::cout << "Load img :" << ImageEdge->GetHeight() << "*" << ImageEdge->GetWidth() << std::endl;
@@ -432,10 +433,15 @@ private: System::Void record_anime_Click(System::Object^ sender, System::EventAr
 		savedTest->vertices[i][0] = Arap->themesh.vertices[i][0];
 		savedTest->vertices[i][1] = Arap->themesh.vertices[i][1];
 	}
+	this->record_anime->ForeColor = Color::Red;
 }
 private: System::Void stop_anime_Click(System::Object^ sender, System::EventArgs^ e) {
 	start_anime->Enabled = actions.size() > 0;
 	animation = false;
+	this->record_anime->ForeColor = this->start_anime->DefaultForeColor;
+}
+private: System::Void Form1_Load(System::Object^ sender, System::EventArgs^ e) {
+	this->start_anime->Enabled = actions.size() > 0;
 }
 };
 }
