@@ -21,13 +21,13 @@ bool show_fitted = false;
 bool depth = false;
 bool animation = false;
 bool peeking = false;
-
+bool isWeight = false;
 #define ARAP_DO_VERIFY	0
 
 #define ARAP_DO_VERIFY	0
 
 void TriMesh2D::draw(bool linemode)
-{	
+{
 	//glColor3f(1.0, 0.0, 0.0);
 	if (linemode)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -37,23 +37,23 @@ void TriMesh2D::draw(bool linemode)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(2, GL_DOUBLE, sizeof(vertices[0]), &vertices[0][0]);
 
-	glDrawElements(GL_TRIANGLES, tris.size()*3, GL_UNSIGNED_INT, (GLvoid*)tris[0]);
-	
+	glDrawElements(GL_TRIANGLES, tris.size() * 3, GL_UNSIGNED_INT, (GLvoid*)tris[0]);
+
 
 }
 void TriMesh2D::compute_normal()
 {
 	double v1[2];
 	double v2[2];
-	for(int i=0;i<tris.size();i++)
+	for (int i = 0; i < tris.size(); i++)
 	{
-		v1[0]=vertices[tris[i][1]][0]-vertices[tris[i][0]][0];
-		v1[1]=vertices[tris[i][1]][1]-vertices[tris[i][0]][1];
-		v2[0]=vertices[tris[i][2]][0]-vertices[tris[i][0]][0];
-		v2[1]=vertices[tris[i][2]][1]-vertices[tris[i][0]][1];
-		if(((v1[0]*v2[1])-(v2[0]*v1[1]))>=0)
+		v1[0] = vertices[tris[i][1]][0] - vertices[tris[i][0]][0];
+		v1[1] = vertices[tris[i][1]][1] - vertices[tris[i][0]][1];
+		v2[0] = vertices[tris[i][2]][0] - vertices[tris[i][0]][0];
+		v2[1] = vertices[tris[i][2]][1] - vertices[tris[i][0]][1];
+		if (((v1[0] * v2[1]) - (v2[0] * v1[1])) >= 0)
 			normals.push_back(1);
-		else 
+		else
 			normals.push_back(-1);
 		//cout<<normals[i]<<endl;
 	}
@@ -64,47 +64,47 @@ int TriMesh2D::normal_detection()
 	double v1[2];
 	double v2[2];
 	double P[3][2];
-	double boundry=5.0;
-	if(normals.size()==tris.size())
+	double boundry = 5.0;
+	if (normals.size() == tris.size())
 	{
 		//cout<<normals.size()<<","<<tris.size()<<endl;
-		for(int i=0;i<normals.size();i++)
+		for (int i = 0; i < normals.size(); i++)
 		{
-			P[0][0]=vertices[tris[i][0]][0];	P[0][1]=vertices[tris[i][0]][1];
-			P[1][0]=vertices[tris[i][1]][0];	P[1][1]=vertices[tris[i][1]][1];
-			P[2][0]=vertices[tris[i][2]][0];	P[2][1]=vertices[tris[i][2]][1];
+			P[0][0] = vertices[tris[i][0]][0];	P[0][1] = vertices[tris[i][0]][1];
+			P[1][0] = vertices[tris[i][1]][0];	P[1][1] = vertices[tris[i][1]][1];
+			P[2][0] = vertices[tris[i][2]][0];	P[2][1] = vertices[tris[i][2]][1];
 
-			for(int j=0;j<3;j++)//§T®§ßŒ3¬I
+			for (int j = 0; j < 3; j++)//‰∏âËßíÂΩ¢3Èªû
 			{
-				for(int k=0;k<4;k++)//§W§U•™•k∞ª¥˙±N∑|§œ¶V
+				for (int k = 0; k < 4; k++)//‰∏ä‰∏ãÂ∑¶Âè≥ÂÅµÊ∏¨Â∞áÊúÉÂèçÂêë
 				{
-					P[j][0]=vertices[tris[i][j]][0];
-					P[j][1]=vertices[tris[i][j]][1];
-					switch(k)
+					P[j][0] = vertices[tris[i][j]][0];
+					P[j][1] = vertices[tris[i][j]][1];
+					switch (k)
 					{
 					case 0://up
-						P[j][1]=vertices[tris[i][j]][1]-boundry;
+						P[j][1] = vertices[tris[i][j]][1] - boundry;
 						break;
 					case 1://down
-						P[j][1]=vertices[tris[i][j]][1]+boundry;
+						P[j][1] = vertices[tris[i][j]][1] + boundry;
 						break;
 					case 2://left
-						P[j][0]=vertices[tris[i][j]][0]-boundry;
+						P[j][0] = vertices[tris[i][j]][0] - boundry;
 						break;
 					case 3://right
-						P[j][0]=vertices[tris[i][j]][0]+boundry;
+						P[j][0] = vertices[tris[i][j]][0] + boundry;
 						break;
 					}
-					v1[0]=P[1][0]-P[0][0];
-					v1[1]=P[1][1]-P[0][1];
-					v2[0]=P[2][0]-P[0][0];
-					v2[1]=P[2][1]-P[0][1];
-					if(((v1[0]*v2[1])-(v2[0]*v1[1]))>=0)
+					v1[0] = P[1][0] - P[0][0];
+					v1[1] = P[1][1] - P[0][1];
+					v2[0] = P[2][0] - P[0][0];
+					v2[1] = P[2][1] - P[0][1];
+					if (((v1[0] * v2[1]) - (v2[0] * v1[1])) >= 0)
 					{
-						if(normals[i]!=1) return 1;
+						if (normals[i] != 1) return 1;
 					}
 					else
-						if(normals[i]!=-1) return 1;
+						if (normals[i] != -1) return 1;
 				}
 			}
 		}
@@ -121,14 +121,14 @@ void draw_circle(const Point2D& center, double r,
 	int segs = (int)(r / err);
 	segs = min(segs, 720);
 
-	glPolygonMode(GL_FRONT_AND_BACK, linemode? GL_LINE : GL_FILL);
+	glPolygonMode(GL_FRONT_AND_BACK, linemode ? GL_LINE : GL_FILL);
 
 	if (linemode)
 		glBegin(GL_LINE_LOOP);
 	else
 		glBegin(GL_POLYGON);
-	r=10;
-	for (double theta = 0; theta < 2*M_PI; theta += 2*M_PI/segs) {
+	r = 10;
+	for (double theta = 0; theta < 2 * M_PI; theta += 2 * M_PI / segs) {
 		Point2D p = center + r * Vec2D(cos(theta), sin(theta));
 		glVertex3d(p[0], p[1], z);
 	}
@@ -143,21 +143,21 @@ namespace umf = boost::numeric::bindings::umfpack;
 
 SparseMatrix::SparseMatrix(int m, int n)
 {
-	if(n_cols==0)m_rows=0;
-	m_rows=m;
-	n_cols=n;
-	
+	if (n_cols == 0)m_rows = 0;
+	m_rows = m;
+	n_cols = n;
+
 }
 
 SparseMatrix::SparseMatrix(const SparseMatrix& B)
 {
-	m_rows = B.m_rows;  
-	n_cols = B.n_cols; 
-	SMatrix_data = B.SMatrix_data;  
-	m_row_indices = B.m_row_indices;  
-	m_col_indices = B.m_col_indices;  
-	PreSave.resize(m_rows,n_cols,false);
-	
+	m_rows = B.m_rows;
+	n_cols = B.n_cols;
+	SMatrix_data = B.SMatrix_data;
+	m_row_indices = B.m_row_indices;
+	m_col_indices = B.m_col_indices;
+	PreSave.resize(m_rows, n_cols, false);
+
 }
 SparseMatrix::~SparseMatrix()
 {
@@ -165,118 +165,118 @@ SparseMatrix::~SparseMatrix()
 }
 void SparseMatrix::resetDim(int m, int n)
 {
-	if(n_cols==0)m_rows=0;
-	m_rows=m;
-	n_cols=n;
-	m_row_indices.clear();  
-	m_col_indices.clear();  
-	SMatrix_data.clear();  
+	if (n_cols == 0)m_rows = 0;
+	m_rows = m;
+	n_cols = n;
+	m_row_indices.clear();
+	m_col_indices.clear();
+	SMatrix_data.clear();
 }
-double SparseMatrix::operator ()(int i ,int j)const
+double SparseMatrix::operator ()(int i, int j)const
 {
 	return get(i, j);
 }
-double& SparseMatrix::operator ()(int i ,int j)
+double& SparseMatrix::operator ()(int i, int j)
 {
-	if( i>=0 && i<m_rows && j>=0 && j<n_cols)
+	if (i >= 0 && i < m_rows && j >= 0 && j < n_cols)
 	{
-		m_row_indices[i].insert( j );  
-		m_col_indices[j].insert( i ); 
-		return SMatrix_data[std::make_pair(i, j)]; 
+		m_row_indices[i].insert(j);
+		m_col_indices[j].insert(i);
+		return SMatrix_data[std::make_pair(i, j)];
 	}
 	else
 		assert("no such data");
 }
-SparseMatrix SparseMatrix::transpose() const  
-{  
-	SparseMatrix T( n_cols, m_rows ); 
-	for ( mat_citer i = SMatrix_data.begin(); i!= SMatrix_data.end(); i++ )  
-	{  
-		T( i->first.second, i->first.first ) = get( i->first.first, i->first.second ); ;
-		
-	}  
+SparseMatrix SparseMatrix::transpose() const
+{
+	SparseMatrix T(n_cols, m_rows);
+	for (mat_citer i = SMatrix_data.begin(); i != SMatrix_data.end(); i++)
+	{
+		T(i->first.second, i->first.first) = get(i->first.first, i->first.second); ;
+
+	}
 
 
-	return T;  
+	return T;
 }
-SparseMatrix SparseMatrix::operator+( const SparseMatrix& B ) const  
-{  
-	if ( m_rows != B.m_rows || n_cols != B.n_cols )  
-		assert("two matrix are not same size!!");  
-	SparseMatrix C( *this );  
-	for ( iset_citer i = B.m_row_indices.begin(); i != B.m_row_indices.end(); i++ )  
-	{  
-		for ( elt_citer j = i->second.begin(); j != i->second.end(); j++ )  
-		{  
-			double elt = B( i->first, *j );  
-			C( i->first, *j ) += elt;  
-		}  
-	}  
-	return C;  
-}  
+SparseMatrix SparseMatrix::operator+(const SparseMatrix& B) const
+{
+	if (m_rows != B.m_rows || n_cols != B.n_cols)
+		assert("two matrix are not same size!!");
+	SparseMatrix C(*this);
+	for (iset_citer i = B.m_row_indices.begin(); i != B.m_row_indices.end(); i++)
+	{
+		for (elt_citer j = i->second.begin(); j != i->second.end(); j++)
+		{
+			double elt = B(i->first, *j);
+			C(i->first, *j) += elt;
+		}
+	}
+	return C;
+}
 vector<double> SparseMatrix::operator*(const vector<double>& x) const  //0.001s
-{    
-	
-	if(x.size()!=n_cols)
-		assert("x.size()!= cols"); 
+{
+
+	if (x.size() != n_cols)
+		assert("x.size()!= cols");
 	vector<double> R;
 	R.resize(m_rows);
-	for (int i=0 ; i<m_rows; i++ )  
-	{	
-		R[i]=0;
-		for (int j=0; j<n_cols ; j++ )  
-		{  
-			double elt = get( i, j );
-			R[i] += elt * x[j];  
-		}  
-	}  
+	for (int i = 0; i < m_rows; i++)
+	{
+		R[i] = 0;
+		for (int j = 0; j < n_cols; j++)
+		{
+			double elt = get(i, j);
+			R[i] += elt * x[j];
+		}
+	}
 
-	return R;  
-}  
-double SparseMatrix::get( int i, int j ) const  
-{  
-	if ( i >= m_rows || j >= n_cols )  
-		assert(">=rows || >=cols"); 
-	mat_citer iter = SMatrix_data.find( make_pair( i, j ) );  
-	if ( iter == SMatrix_data.end() )  
-		return 0.0;  
-	return iter->second;  
-} 
+	return R;
+}
+double SparseMatrix::get(int i, int j) const
+{
+	if (i >= m_rows || j >= n_cols)
+		assert(">=rows || >=cols");
+	mat_citer iter = SMatrix_data.find(make_pair(i, j));
+	if (iter == SMatrix_data.end())
+		return 0.0;
+	return iter->second;
+}
 
 void SparseMatrix::PreSaveMatrix()
 {
-	PreSave.resize(m_rows,n_cols,false);
-	for ( mat_citer i = SMatrix_data.begin(); i!= SMatrix_data.end(); i++ ) // 0.003s
-	{  
-		PreSave( i->first.first, i->first.second ) = get( i->first.first, i->first.second ); ;
+	PreSave.resize(m_rows, n_cols, false);
+	for (mat_citer i = SMatrix_data.begin(); i != SMatrix_data.end(); i++) // 0.003s
+	{
+		PreSave(i->first.first, i->first.second) = get(i->first.first, i->first.second); ;
 
 	}
 }
 vector<double> SparseMatrix::solve(const vector<double>& b)
 {
-	if(b.size()!=n_cols)
+	if (b.size() != n_cols)
 		assert("size not the same!!");
 	vector<double> x(m_rows);
 
 
 	umf::symbolic_type<double> Symbolic;
 	umf::numeric_type<double> Numeric;
-	umf::symbolic (PreSave, Symbolic); 
-	umf::numeric (PreSave, Symbolic, Numeric); 
+	umf::symbolic(PreSave, Symbolic);
+	umf::numeric(PreSave, Symbolic, Numeric);
 
-	umf::solve (PreSave, x, b, Numeric);
-	
+	umf::solve(PreSave, x, b, Numeric);
+
 	return x;
 }
 void SparseMatrix::print()
 {
-	for(int i=0;i<m_rows;i++)
+	for (int i = 0; i < m_rows; i++)
 	{
-		for(int j=0;j<n_cols;j++)
+		for (int j = 0; j < n_cols; j++)
 		{
-			cout<<get(i,j)<<" ";
+			cout << get(i, j) << " ";
 		}
-		cout<<endl;
+		cout << endl;
 	}
 }
 //=======================ShapeView========================//
@@ -286,7 +286,7 @@ Point2D ShapeView::window2world(const Point2D& win_pt)
 }
 double ShapeView::window2world(double win_len)
 {
-	return win_len*1000;
+	return win_len * 1000;
 }
 Point2D ShapeView::world2window(const Point2D& pos)
 {
@@ -298,15 +298,15 @@ void ShapeView::refresh()
 }
 ShapeView::ButtonState ShapeView::get_button_state()
 {
-	if(b_state==0)return LBUTTON_DOWN;
-	else if(b_state==1)return MBUTTON_DOWN;
-	else if(b_state==2)return RBUTTON_DOWN;
+	if (b_state == 0)return LBUTTON_DOWN;
+	else if (b_state == 1)return MBUTTON_DOWN;
+	else if (b_state == 2)return RBUTTON_DOWN;
 }
 void ShapeView::button_state(int state)
 {
-	if(state==0)b_state=0;
-	else if(state==1)b_state=1;
-	else if(state==2)b_state=2;
+	if (state == 0)b_state = 0;
+	else if (state == 1)b_state = 1;
+	else if (state == 2)b_state = 2;
 }
 //========================================================//
 SparseMatrix BigG, G00, G01, G10, G11, Gprime, B;
@@ -337,14 +337,14 @@ ArapInteractor::ArapInteractor(ShapeView* view, const TriMesh2D& mesh)
 
 	// Reset the states
 	flags.resize(themesh.vertices.size(), 0);
-	savelastFlagsPosition.resize(themesh.vertices.size(),Point2D((double)0, (double)0));//!!
+	savelastFlagsPosition.resize(themesh.vertices.size(), Point2D((double)0, (double)0));//!!
 	selectedTri.resize(themesh.tris.size(), false);
-	
+
 	beingDragged = false;
 	preCompG();
 	preCompF();
 	preCompH();
-	cout<<"ArapInteractor set! vertices size : "<<themesh.vertices.size()<<endl;
+	cout << "ArapInteractor set! vertices size : " << themesh.vertices.size() << endl;
 }
 
 ArapInteractor::~ArapInteractor(void)
@@ -366,7 +366,7 @@ void ArapInteractor::getGeachTri(const Tri& t, double G[][6])
 			A[i][j] = 0;
 
 	for (int i = 0; i < 3; i++) {
-		int i0 = i, i1 = (i+1)%3, i2 = (i+2)%3;
+		int i0 = i, i1 = (i + 1) % 3, i2 = (i + 2) % 3;
 
 		const Point2D& v0 = themesh.vertices[t[i0]];
 		const Point2D& v1 = themesh.vertices[t[i1]];
@@ -378,37 +378,37 @@ void ArapInteractor::getGeachTri(const Tri& t, double G[][6])
 		//  xdir[1] * x01 + ydir[1] * y01 = v2dir[1]
 		//
 
-		Vec2D xdir = v1-v0;
+		Vec2D xdir = v1 - v0;
 		Vec2D ydir(-xdir[1], xdir[0]);
-		Vec2D v2dir = v2-v0;
-		double det = xdir[0]*ydir[1] - xdir[1]*ydir[0];
-		double x01 = (v2dir[0]*ydir[1] - v2dir[1]*ydir[0])/det;
-		double y01 = (xdir[0]*v2dir[1] - xdir[1]*v2dir[0])/det;
+		Vec2D v2dir = v2 - v0;
+		double det = xdir[0] * ydir[1] - xdir[1] * ydir[0];
+		double x01 = (v2dir[0] * ydir[1] - v2dir[1] * ydir[0]) / det;
+		double y01 = (xdir[0] * v2dir[1] - xdir[1] * v2dir[0]) / det;
 
 #if ARAP_DO_VERIFY
 		// verify:
-		Point2D v22 = v0 + x01*xdir + y01*ydir;
-		double err = len(v22-v2);
+		Point2D v22 = v0 + x01 * xdir + y01 * ydir;
+		double err = len(v22 - v2);
 #endif
 		// Now ready for A
 
 		// for v0'
-		A[0][i0*2]	 += 1-x01;
-		A[1][i0*2]	 += -y01;
-		A[0][i0*2+1] += y01;
-		A[1][i0*2+1] += 1-x01;
+		A[0][i0 * 2] += 1 - x01;
+		A[1][i0 * 2] += -y01;
+		A[0][i0 * 2 + 1] += y01;
+		A[1][i0 * 2 + 1] += 1 - x01;
 
 		// for v1'
-		A[0][i1*2]	 += x01;
-		A[1][i1*2]	 += y01;
-		A[0][i1*2+1] += -y01;
-		A[1][i1*2+1] += x01;
+		A[0][i1 * 2] += x01;
+		A[1][i1 * 2] += y01;
+		A[0][i1 * 2 + 1] += -y01;
+		A[1][i1 * 2 + 1] += x01;
 
 		// for v2'
-		A[0][i2*2]	 += -1;
-		A[1][i2*2]	 += 0;
-		A[0][i2*2+1] += 0;
-		A[1][i2*2+1] += -1;
+		A[0][i2 * 2] += -1;
+		A[1][i2 * 2] += 0;
+		A[0][i2 * 2 + 1] += 0;
+		A[1][i2 * 2 + 1] += -1;
 	}
 
 	transpose<double, 2, 6>(A, At);
@@ -424,12 +424,12 @@ void ArapInteractor::getGeachTri(const Tri& t, double G[][6])
 
 	// Verify again
 	double vt[] = { v0[0], v0[1], v1[0], v1[1], v2[0], v2[1] };
-	double v[] =  { v0[0], v0[1], v1[0], v1[1], v2[0], v2[1] };
-	double b[]  =  { 0, 0, 0, 0, 0, 0 };;
+	double v[] = { v0[0], v0[1], v1[0], v1[1], v2[0], v2[1] };
+	double b[] = { 0, 0, 0, 0, 0, 0 };;
 	mul<double, 6, 6>(G, v, b);
 	double err = 0;
 	for (int i = 0; i < 6; i++)
-		err += vt[i]*b[i];
+		err += vt[i] * b[i];
 
 #endif
 
@@ -451,7 +451,7 @@ void ArapInteractor::getGeachTri(const Tri& t, double G[][6])
 			for (int jj = 0; jj < 6; jj++)
 				A[ii][jj] = 0;
 
-		int i0 = i, i1 = (i+1)%3, i2 = (i+2)%3;
+		int i0 = i, i1 = (i + 1) % 3, i2 = (i + 2) % 3;
 
 		const Point2D& v0 = themesh.vertices[t[i0]];
 		const Point2D& v1 = themesh.vertices[t[i1]];
@@ -463,37 +463,37 @@ void ArapInteractor::getGeachTri(const Tri& t, double G[][6])
 		//  xdir[1] * x01 + ydir[1] * y01 = v2dir[1]
 		//
 
-		Vec2D xdir = v1-v0;
+		Vec2D xdir = v1 - v0;
 		Vec2D ydir(-xdir[1], xdir[0]);
-		Vec2D v2dir = v2-v0;
-		double det = xdir[0]*ydir[1] - xdir[1]*ydir[0];
-		double x01 = (v2dir[0]*ydir[1] - v2dir[1]*ydir[0])/det;
-		double y01 = (xdir[0]*v2dir[1] - xdir[1]*v2dir[0])/det;
+		Vec2D v2dir = v2 - v0;
+		double det = xdir[0] * ydir[1] - xdir[1] * ydir[0];
+		double x01 = (v2dir[0] * ydir[1] - v2dir[1] * ydir[0]) / det;
+		double y01 = (xdir[0] * v2dir[1] - xdir[1] * v2dir[0]) / det;
 
 #if ARAP_DO_VERIFY
 		// verify:
-		Point2D v22 = v0 + x01*xdir + y01*ydir;
-		double err = len(v22-v2);
+		Point2D v22 = v0 + x01 * xdir + y01 * ydir;
+		double err = len(v22 - v2);
 #endif
 		// Now ready for A
 
 		// for v0'
-		A[0][i0*2]	 = 1-x01;
-		A[1][i0*2]	 = -y01;
-		A[0][i0*2+1] = y01;
-		A[1][i0*2+1] = 1-x01;
+		A[0][i0 * 2] = 1 - x01;
+		A[1][i0 * 2] = -y01;
+		A[0][i0 * 2 + 1] = y01;
+		A[1][i0 * 2 + 1] = 1 - x01;
 
 		// for v1'
-		A[0][i1*2]	 = x01;
-		A[1][i1*2]	 = y01;
-		A[0][i1*2+1] = -y01;
-		A[1][i1*2+1] = x01;
+		A[0][i1 * 2] = x01;
+		A[1][i1 * 2] = y01;
+		A[0][i1 * 2 + 1] = -y01;
+		A[1][i1 * 2 + 1] = x01;
 
 		// for v2'
-		A[0][i2*2]	 = -1;
-		A[1][i2*2]	 = 0;
-		A[0][i2*2+1] = 0;
-		A[1][i2*2+1] = -1;
+		A[0][i2 * 2] = -1;
+		A[1][i2 * 2] = 0;
+		A[0][i2 * 2 + 1] = 0;
+		A[1][i2 * 2 + 1] = -1;
 
 		transpose<double, 2, 6>(A, At);
 		mul<double, 6, 2, 6>(At, A, tmpG);
@@ -513,28 +513,28 @@ void ArapInteractor::getGeachTri(const Tri& t, double G[][6])
 
 		// Verify again
 		double vt[] = { _v0[0], _v0[1], _v1[0], _v1[1], _v2[0], _v2[1] };
-		double v[] =  { _v0[0], _v0[1], _v1[0], _v1[1], _v2[0], _v2[1] };
-		double b[]  =  { 0, 0, 0, 0, 0, 0 };
+		double v[] = { _v0[0], _v0[1], _v1[0], _v1[1], _v2[0], _v2[1] };
+		double b[] = { 0, 0, 0, 0, 0, 0 };
 		mul<double, 6, 6>(G, v, b);
 		double err2 = 0;
 		for (int i = 0; i < 6; i++)
-			err2 += vt[i]*b[i];
+			err2 += vt[i] * b[i];
 		printf("%g\n", err2);
 #endif
 
 	}
 
-// 	//=============================print===========================
-// 	cout<<"\n\nprint G[6][6]\n";
-// 	for (int i = 0; i < 6; i++)
-// 	{
-// 		for (int j = 0; j < 6; j++)
-// 		{
-// 			cout<<G[i][j]<<" ";
-// 		}
-// 		cout<<endl;
-// 	}
-// 	//=============================================================
+	// 	//=============================print===========================
+	// 	cout<<"\n\nprint G[6][6]\n";
+	// 	for (int i = 0; i < 6; i++)
+	// 	{
+	// 		for (int j = 0; j < 6; j++)
+	// 		{
+	// 			cout<<G[i][j]<<" ";
+	// 		}
+	// 		cout<<endl;
+	// 	}
+	// 	//=============================================================
 }
 #endif
 
@@ -542,7 +542,7 @@ void ArapInteractor::preCompG()
 {
 
 	int nv = flags.size();
-	BigG.resetDim(nv*2, nv*2);
+	BigG.resetDim(nv * 2, nv * 2);
 
 	// For each triangle
 	int nt = (int)themesh.tris.size();
@@ -553,10 +553,10 @@ void ArapInteractor::preCompG()
 
 		for (int j = 0; j < 3; j++)
 			for (int k = 0; k < 3; k++) {
-				BigG(t[j]*2,   t[k]*2)   += G[j*2  ][k*2  ];
-				BigG(t[j]*2+1, t[k]*2)   += G[j*2+1][k*2  ];
-				BigG(t[j]*2,   t[k]*2+1) += G[j*2  ][k*2+1];
-				BigG(t[j]*2+1, t[k]*2+1) += G[j*2+1][k*2+1];
+				BigG(t[j] * 2, t[k] * 2) += G[j * 2][k * 2];
+				BigG(t[j] * 2 + 1, t[k] * 2) += G[j * 2 + 1][k * 2];
+				BigG(t[j] * 2, t[k] * 2 + 1) += G[j * 2][k * 2 + 1];
+				BigG(t[j] * 2 + 1, t[k] * 2 + 1) += G[j * 2 + 1][k * 2 + 1];
 			}
 	}
 }
@@ -577,10 +577,10 @@ void ArapInteractor::preStep1()
 	if (cur_ctrl == 0 || cur_free == 0)
 		return;
 
-	G00.resetDim(cur_free*2, cur_free*2);
-	G01.resetDim(cur_free*2, cur_ctrl*2);
-	G10.resetDim(cur_ctrl*2, cur_free*2);
-	G11.resetDim(cur_ctrl*2, cur_ctrl*2);
+	G00.resetDim(cur_free * 2, cur_free * 2);
+	G01.resetDim(cur_free * 2, cur_ctrl * 2);
+	G10.resetDim(cur_ctrl * 2, cur_free * 2);
+	G11.resetDim(cur_ctrl * 2, cur_ctrl * 2);
 
 	// For each triangle
 	int nt = (int)themesh.tris.size();
@@ -602,17 +602,17 @@ void ArapInteractor::preStep1()
 				else // if (flags[t[j]] && flags[t[k]])
 					GG = &G11;
 
-				(*GG)(m[j]*2,   m[k]*2)   = BigG(t[j]*2,   t[k]*2);
-				(*GG)(m[j]*2+1, m[k]*2)   = BigG(t[j]*2+1, t[k]*2);
-				(*GG)(m[j]*2,   m[k]*2+1) = BigG(t[j]*2,   t[k]*2+1);
-				(*GG)(m[j]*2+1, m[k]*2+1) = BigG(t[j]*2+1, t[k]*2+1);
+				(*GG)(m[j] * 2, m[k] * 2) = BigG(t[j] * 2, t[k] * 2);
+				(*GG)(m[j] * 2 + 1, m[k] * 2) = BigG(t[j] * 2 + 1, t[k] * 2);
+				(*GG)(m[j] * 2, m[k] * 2 + 1) = BigG(t[j] * 2, t[k] * 2 + 1);
+				(*GG)(m[j] * 2 + 1, m[k] * 2 + 1) = BigG(t[j] * 2 + 1, t[k] * 2 + 1);
 			}
 	}
 
 	SparseMatrix G00_T = G00.transpose();
 	SparseMatrix G10_T = G10.transpose();
 
-	Gprime = G00+G00_T;
+	Gprime = G00 + G00_T;
 	B = G01 + G10_T;
 	Gprime.PreSaveMatrix();
 
@@ -634,7 +634,8 @@ void ArapInteractor::preStep1()
 		if (!flags[i]) {
 			u.push_back(themesh.vertices[i][0]);
 			u.push_back(themesh.vertices[i][1]);
-		} else {
+		}
+		else {
 			q.push_back(themesh.vertices[i][0]);
 			q.push_back(themesh.vertices[i][1]);
 		}
@@ -644,8 +645,8 @@ void ArapInteractor::preStep1()
 
 	vector<double> BigGv = BigG * v;
 	double err = 0;
-	for (int i = 0; i < nv*2; i++)
-		err += BigGv[i]*v[i];
+	for (int i = 0; i < nv * 2; i++)
+		err += BigGv[i] * v[i];
 
 	vector<double> Gpu = Gprime * u;
 	vector<double> Bq = B * q;
@@ -665,7 +666,7 @@ void ArapInteractor::step1()
 		q.push_back(themesh.vertices[i][0]);
 		q.push_back(themesh.vertices[i][1]);
 	}
-	Bq = B*q;
+	Bq = B * q;
 	for (int i = 0; i < (int)Bq.size(); i++)
 		Bq[i] = -Bq[i];
 
@@ -701,25 +702,25 @@ void ArapInteractor::getFeachTri(const Tri& t, double K[][4], double F[][4])
 	//  xdir[1] * x01 + ydir[1] * y01 = v2dir[1]
 	//
 
-	Vec2D xdir = v1-v0;
+	Vec2D xdir = v1 - v0;
 	Vec2D ydir(-xdir[1], xdir[0]);
-	Vec2D v2dir = v2-v0;
-	double det = xdir[0]*ydir[1] - xdir[1]*ydir[0];
-	double x01 = (v2dir[0]*ydir[1] - v2dir[1]*ydir[0])/det;
-	double y01 = (xdir[0]*v2dir[1] - xdir[1]*v2dir[0])/det;
+	Vec2D v2dir = v2 - v0;
+	double det = xdir[0] * ydir[1] - xdir[1] * ydir[0];
+	double x01 = (v2dir[0] * ydir[1] - v2dir[1] * ydir[0]) / det;
+	double y01 = (xdir[0] * v2dir[1] - xdir[1] * v2dir[0]) / det;
 
 #if ARAP_DO_VERIFY
 	// verify:
-	Point2D v22 = v0 + x01*xdir + y01*ydir;
-	double err = len(v22-v2);
+	Point2D v22 = v0 + x01 * xdir + y01 * ydir;
+	double err = len(v22 - v2);
 #endif
 	// Now ready for F
 
 	// for v0'
-	K[4][0] = 1-x01;
+	K[4][0] = 1 - x01;
 	K[5][0] = -y01;
 	K[4][1] = y01;
-	K[5][1] = 1-x01;
+	K[5][1] = 1 - x01;
 
 	// for v1'
 	K[4][2] = x01;
@@ -782,15 +783,15 @@ void ArapInteractor::getHeachTri(const Tri& t, double H[][6])
 			for (int jj = 0; jj < 6; jj++)
 				tI[ii][jj] = 0;
 
-		int i0 = i, i1 = (i+1)%3, i2 = (i+2)%3;
+		int i0 = i, i1 = (i + 1) % 3, i2 = (i + 2) % 3;
 
 		// for v0'
-		tI[0][i0*2]	  = -1;
-		tI[1][i0*2+1] = -1;
+		tI[0][i0 * 2] = -1;
+		tI[1][i0 * 2 + 1] = -1;
 
 		// for v1'
-		tI[0][i1*2]	  = 1;
-		tI[1][i1*2+1] = 1;
+		tI[0][i1 * 2] = 1;
+		tI[1][i1 * 2 + 1] = 1;
 
 		transpose<double, 2, 6>(tI, tIt);
 
@@ -820,7 +821,7 @@ void ArapInteractor::getHeachTri(const Tri& t, double H[][6])
 void ArapInteractor::preCompH()
 {
 	int nv = flags.size();
-	BigH.resetDim(nv*2, nv*2);
+	BigH.resetDim(nv * 2, nv * 2);
 
 	// For each triangle
 	int nt = (int)themesh.tris.size();
@@ -840,18 +841,18 @@ void ArapInteractor::preCompH()
 		memset(f, 0, sizeof(f));
 
 		for (int i = 0; i < 3; i++) {
-			int j = (i+1) % 3;
-			Vec2D vij_f = fitted[j]-fitted[i];
-			vfitted[2*i] = vij_f[0];
-			vfitted[2*i+1] = vij_f[1];
+			int j = (i + 1) % 3;
+			Vec2D vij_f = fitted[j] - fitted[i];
+			vfitted[2 * i] = vij_f[0];
+			vfitted[2 * i + 1] = vij_f[1];
 
-			v[2*i] = themesh.vertices[t[i]][0];
-			v[2*i+1] = themesh.vertices[t[i]][1];
+			v[2 * i] = themesh.vertices[t[i]][0];
+			v[2 * i + 1] = themesh.vertices[t[i]][1];
 
-			f[2*i] += vij_f[0];
-			f[2*i+1] += vij_f[1];
-			f[2*j] += -vij_f[0];
-			f[2*j+1] += -vij_f[1];
+			f[2 * i] += vij_f[0];
+			f[2 * i + 1] += vij_f[1];
+			f[2 * j] += -vij_f[0];
+			f[2 * j + 1] += -vij_f[1];
 		}
 
 		double tI[6][6];
@@ -859,13 +860,13 @@ void ArapInteractor::preCompH()
 			for (int j = 0; j < 6; j++)
 				tI[i][j] = 0;
 		for (int i = 0; i < 3; i++) {
-			int j = (i+1) % 3;
-			tI[i*2][i*2] = -1;
-			tI[i*2+1][i*2+1] = -1;
-			tI[i*2][j*2] = 1;
-			tI[i*2+1][j*2+1] = 1;
+			int j = (i + 1) % 3;
+			tI[i * 2][i * 2] = -1;
+			tI[i * 2 + 1][i * 2 + 1] = -1;
+			tI[i * 2][j * 2] = 1;
+			tI[i * 2 + 1][j * 2 + 1] = 1;
 		}
-		double vfitted2[6] = {0, 0, 0, 0, 0, 0};
+		double vfitted2[6] = { 0, 0, 0, 0, 0, 0 };
 		mul<double, 6, 6>(tI, v, vfitted2);
 
 		double Hv[6];
@@ -873,22 +874,22 @@ void ArapInteractor::preCompH()
 		mul<double, 6, 6>(H, v, Hv);
 		double err = 0;
 		for (int i = 0; i < 6; i++)
-			err += Hv[i]*v[i];
+			err += Hv[i] * v[i];
 		for (int i = 0; i < 6; i++)
-			err += 2*f[i]*v[i];
+			err += 2 * f[i] * v[i];
 		for (int i = 0; i < 6; i++)
-			err += vfitted[i]*vfitted[i];
+			err += vfitted[i] * vfitted[i];
 #endif
 		for (int j = 0; j < 3; j++)
 			for (int k = 0; k < 3; k++) {
-				if (H[j*2][k*2] != 0)
-					BigH(t[j]*2,   t[k]*2)   += H[j*2  ][k*2  ];
-				if (H[j*2+1][k*2] != 0)
-					BigH(t[j]*2+1, t[k]*2)   += H[j*2+1][k*2  ];
-				if (H[j*2][k*2+1] != 0)
-					BigH(t[j]*2,   t[k]*2+1) += H[j*2  ][k*2+1];
-				if (H[j*2+1][k*2+1] != 0)
-					BigH(t[j]*2+1, t[k]*2+1) += H[j*2+1][k*2+1];
+				if (H[j * 2][k * 2] != 0)
+					BigH(t[j] * 2, t[k] * 2) += H[j * 2][k * 2];
+				if (H[j * 2 + 1][k * 2] != 0)
+					BigH(t[j] * 2 + 1, t[k] * 2) += H[j * 2 + 1][k * 2];
+				if (H[j * 2][k * 2 + 1] != 0)
+					BigH(t[j] * 2, t[k] * 2 + 1) += H[j * 2][k * 2 + 1];
+				if (H[j * 2 + 1][k * 2 + 1] != 0)
+					BigH(t[j] * 2 + 1, t[k] * 2 + 1) += H[j * 2 + 1][k * 2 + 1];
 			}
 	}
 }
@@ -921,10 +922,10 @@ void ArapInteractor::preStep2()//0.05
 	if (cur_ctrl == 0 || cur_free == 0)
 		return;
 
-	H00.resetDim(cur_free*2, cur_free*2);
-	H01.resetDim(cur_free*2, cur_ctrl*2);
-	H10.resetDim(cur_ctrl*2, cur_free*2);
-	H11.resetDim(cur_ctrl*2, cur_ctrl*2);
+	H00.resetDim(cur_free * 2, cur_free * 2);
+	H01.resetDim(cur_free * 2, cur_ctrl * 2);
+	H10.resetDim(cur_ctrl * 2, cur_free * 2);
+	H11.resetDim(cur_ctrl * 2, cur_ctrl * 2);
 
 	// For each triangle
 	for (int i = 0; i < nt; i++) {
@@ -936,7 +937,7 @@ void ArapInteractor::preStep2()//0.05
 			for (int k = 0; k < 3; k++) {
 				SparseMatrix* HH = NULL;
 				// Non-zeros could only be the diagonal entries 
-				if (!flags[t[j]] && !flags[t[k]]) 
+				if (!flags[t[j]] && !flags[t[k]])
 					HH = &H00;
 				else if (!flags[t[j]] && flags[t[k]])
 					HH = &H01;
@@ -944,30 +945,35 @@ void ArapInteractor::preStep2()//0.05
 					HH = &H10;
 				else // if (flags[t[j]] && flags[t[k]])
 					HH = &H11;
-				
-				(*HH)(m[j]*2,   m[k]*2)   = BigH(t[j]*2,   t[k]*2);
-				(*HH)(m[j]*2+1, m[k]*2)   = BigH(t[j]*2+1, t[k]*2);
-				(*HH)(m[j]*2,   m[k]*2+1) = BigH(t[j]*2,   t[k]*2+1);
-				(*HH)(m[j]*2+1, m[k]*2+1) = BigH(t[j]*2+1, t[k]*2+1);
+
+				(*HH)(m[j] * 2, m[k] * 2) = BigH(t[j] * 2, t[k] * 2);
+				(*HH)(m[j] * 2 + 1, m[k] * 2) = BigH(t[j] * 2 + 1, t[k] * 2);
+				(*HH)(m[j] * 2, m[k] * 2 + 1) = BigH(t[j] * 2, t[k] * 2 + 1);
+				(*HH)(m[j] * 2 + 1, m[k] * 2 + 1) = BigH(t[j] * 2 + 1, t[k] * 2 + 1);
 			}
 	}
 
 	SparseMatrix H00_T = H00.transpose();
 	SparseMatrix H10_T = H10.transpose();
 
-	Hprime = H00+H00_T;
+	Hprime = H00 + H00_T;
 	D = H01 + H10_T;
 	Hprime.PreSaveMatrix();
 }
 
 void ArapInteractor::step2()//0.6
 {
+	
 	// Compute C
 
 	// For each triangle
 	int nt = (int)themesh.tris.size();
 
 	for (int i = 0; i < nt; i++) {
+		if (isWeight == true && selectedTri[i])
+		{
+			continue;
+		}
 		double _K[6][4], _Kt[4][6];
 		for (int ii = 0; ii < 6; ii++) {
 			for (int jj = 0; jj < 4; jj++)
@@ -983,7 +989,7 @@ void ArapInteractor::step2()//0.6
 		const Point2D& v2 = themesh.vertices[t[2]];
 
 		double vprime[] = { v0[0], v0[1], v1[0], v1[1], v2[0], v2[1] };
-		double _C_tmp[4] = {0, 0, 0, 0};
+		double _C_tmp[4] = { 0, 0, 0, 0 };
 		mul<double, 4, 6>(_Kt, vprime, _C_tmp);
 		for (int j = 0; j < 4; j++)
 			C[i][j] = _C_tmp[j];
@@ -1007,30 +1013,34 @@ void ArapInteractor::step2()//0.6
 		fittedVertices[i][1][1] = vfit[3];
 		fittedVertices[i][2][0] = vfit[4];
 		fittedVertices[i][2][1] = vfit[5];
+		
 
-		// Compute scale and scale back to get congruent triangles
-		// The paper doesn't say anything about how to scale, so I assue
-		// it's around the gravity center
-		Point2D center = fittedVertices[i][0] +
-			fittedVertices[i][1] + fittedVertices[i][2];
-		center /= 3.0;
+			// Compute scale and scale back to get congruent triangles
+			// The paper doesn't say anything about how to scale, so I assue
+			// it's around the gravity center
+			Point2D center = fittedVertices[i][0] +
+				fittedVertices[i][1] + fittedVertices[i][2];
+			center /= 3.0;
 
-		double scale = dist(fittedVertices[i][0], fittedVertices[i][1]) +
-			dist(fittedVertices[i][1], fittedVertices[i][2]) + 
-			dist(fittedVertices[i][2], fittedVertices[i][0]);
-		scale /= dist(baseVertices[t[0]], baseVertices[t[1]]) + 
-			dist(baseVertices[t[1]], baseVertices[t[2]]) + 
-			dist(baseVertices[t[2]], baseVertices[t[0]]);
+			double scale = dist(fittedVertices[i][0], fittedVertices[i][1]) +
+				dist(fittedVertices[i][1], fittedVertices[i][2]) +
+				dist(fittedVertices[i][2], fittedVertices[i][0]);
+			scale /= dist(baseVertices[t[0]], baseVertices[t[1]]) +
+				dist(baseVertices[t[1]], baseVertices[t[2]]) +
+				dist(baseVertices[t[2]], baseVertices[t[0]]);
 
-		for (int j = 0; j < 3; j++) {
-			Vec2D v = fittedVertices[i][j]-center;
-			v /= scale;
-			fittedVertices[i][j] = center + v;
-		}
+			for (int j = 0; j < 3; j++) {
+				Vec2D v = fittedVertices[i][j] - center;
+				v /= scale;
+				fittedVertices[i][j] = center + v;
+			}
+		
+		
 	}
 
 	if (step1_only)
 		return;
+	
 	// The second sub-step of step2
 
 	// Compute q
@@ -1039,6 +1049,7 @@ void ArapInteractor::step2()//0.6
 
 	vector<int> vert_map(nv, 0);
 	for (int i = 0; i < nv; i++) {
+		
 		if (flags[i] == 0)
 			vert_map[i] = cur_free++;
 		else {
@@ -1053,43 +1064,69 @@ void ArapInteractor::step2()//0.6
 
 	// This is Dq
 
- 	Dq_plus_f0 = D*q;
+	Dq_plus_f0 = D * q;
 
 	// Compute f0 and f1
- 	vector<double> f(nv*2, 0), f0(cur_free*2), f1(cur_ctrl*2);
- 
+	vector<double> f(nv * 2, 0), f0(cur_free * 2), f1(cur_ctrl * 2);
+
 	for (int ti = 0; ti < nt; ti++) {
+		
 		const Tri& t = themesh.tris[ti];
 		vector<Point2D>& fitted = fittedVertices[ti];
+		vector<Point2D>& chfitted = fittedVertices[ti];
 		for (int i = 0; i < 3; i++) {
-			int j = (i+1) % 3;
-			Vec2D vij_f = fitted[j]-fitted[i];
-			f[2*t[i]] += -2*vij_f[0];
-			f[2*t[i]+1] += -2*vij_f[1];
-			f[2*t[j]] += 2*vij_f[0];
-			f[2*t[j]+1] += 2*vij_f[1];
+			int j = (i + 1) % 3;
+			Vec2D vij_f = fitted[j] - fitted[i];
+			f[2 * t[i]] += -2 * vij_f[0];
+			f[2 * t[i] + 1] += -2 * vij_f[1];
+			f[2 * t[j]] += 2 * vij_f[0];
+			f[2 * t[j] + 1] += 2 * vij_f[1];
+		}
+		if (isWeight == true && selectedTri[ti])
+		{
+			for (int i = 0; i < 3; i++) {
+				int j = (i + 1) % 3;
+				Vec2D vij_f = chfitted[j];
+				f[2 * t[i]] =  vij_f[0];
+				f[2 * t[i] + 1] = vij_f[1];
+				f[2 * t[j]] =vij_f[0];
+				f[2 * t[j] + 1] =  vij_f[1];
+			}
 		}
 	}
 	// Map them into f0, f1
 	for (int i = 0; i < nv; i++) {
+		/*if (isWeight == true && selectedTri[i])
+		{
+			continue;
+		}*/
 		if (flags[i] == 0) {
-			f0[2*vert_map[i]] = f[2*i];
-			f0[2*vert_map[i]+1] = f[2*i+1];
-		} else {
-			f1[2*vert_map[i]] = f[2*i];
-			f1[2*vert_map[i]+1] = f[2*i+1];
+			f0[2 * vert_map[i]] = f[2 * i];
+			f0[2 * vert_map[i] + 1] = f[2 * i + 1];
+		}
+		else {
+			f1[2 * vert_map[i]] = f[2 * i];
+			f1[2 * vert_map[i] + 1] = f[2 * i + 1];
 		}
 	}
 	// Compute Dq_plus_f0, and negate it
 	for (int i = 0; i < (int)Dq_plus_f0.size(); i++) {
+		/*if (isWeight == true && selectedTri[i])
+		{
+			continue;
+		}*/
 		Dq_plus_f0[i] -= f0[i];
 		Dq_plus_f0[i] = -Dq_plus_f0[i];
 	}
-	
+
 	vector<double> u = Hprime.solve(Dq_plus_f0);
 
 	int ui = 0;
 	for (int i = 0; i < nv; i++) {
+		if (isWeight == true && selectedTri[i])
+		{
+			continue;
+		}
 		if (flags[i])
 			continue;
 		themesh.vertices[i][0] = u[ui++];
@@ -1115,12 +1152,14 @@ void ArapInteractor::deform()
 	}
 
 	if (ctrl_verts.size() == nv) {
-	} else if (ctrl_verts.size() == 1) {
-		Vec2D v = themesh.vertices[ctrl_verts[0]]-baseVertices[ctrl_verts[0]];
+	}
+	else if (ctrl_verts.size() == 1) {
+		Vec2D v = themesh.vertices[ctrl_verts[0]] - baseVertices[ctrl_verts[0]];
 		for (int i = 0; i < nv; i++) {
 			themesh.vertices[i] = baseVertices[i] + v;
 		}
-	} else {
+	}
+	else {
 		themesh.vertices = baseVertices;
 	}
 	step2();//0.004
@@ -1148,8 +1187,8 @@ void ArapInteractor::OnDraw(int vp)
 		glTranslated(0, 0, .01);
 
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
-		glColor4f(.5f, .5f, .5f, 0.7f); 
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glColor4f(.5f, .5f, .5f, 0.7f);
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -1199,7 +1238,7 @@ void ArapInteractor::OnDraw(int vp)
 	glLineWidth(2);
 	glColor3f(.0f, .0f, .8f);
 	glEnable(GL_LINE_SMOOTH);
-	for (int i = 0; i < (int)themesh.vertices.size(); i++){
+	for (int i = 0; i < (int)themesh.vertices.size(); i++) {
 		if (flags[i] > 0) {
 			draw_circle(themesh.vertices[i], 0.02, 0.002, 0, true);
 		}
@@ -1219,39 +1258,39 @@ void ArapInteractor::OnDrawInfo(int vp)
 {
 }
 
-void ArapInteractor::OnMotion(int x, int y, int flag,bool mouse_down, int vp)
+void ArapInteractor::OnMotion(int x, int y, int flag, bool mouse_down, int vp)
 {
 	Point2D pos = Point2D((double)x, (double)y);
-	
+
 	double thresh = 30;
-	int detection;//∞ª¥˙normal§œ¶V
+	int detection;//ÂÅµÊ∏¨normalÂèçÂêë
 	if (mouse_down) {
 		beingDragged = true;
 		// setup constraint
 		themesh.vertices[flag] = pos;
 		deform();
 
-		if(!themesh.normal_detection())//normal§£∑|§œ¶V
+		if (!themesh.normal_detection())//normal‰∏çÊúÉÂèçÂêë
 		{
-			for(int i=0;i<themesh.vertices.size();i++)
+			for (int i = 0; i < themesh.vertices.size(); i++)
 			{
-				savelastFlagsPosition[i]=themesh.vertices[i];
-			}			
+				savelastFlagsPosition[i] = themesh.vertices[i];
+			}
 		}
 		else
 		{
-			for(int i=0;i<themesh.vertices.size();i++)
+			for (int i = 0; i < themesh.vertices.size(); i++)
 			{
-				themesh.vertices[i]=savelastFlagsPosition[i];
+				themesh.vertices[i] = savelastFlagsPosition[i];
 			}
 		}
 	}
 }
 int ArapInteractor::getVertex(int x, int y)
-{	
+{
 	Point2D pos = Point2D((double)x, (double)y);
 	double thresh = 15.0;
-	for (int i = 0; i < (int)themesh.vertices.size(); i++){
+	for (int i = 0; i < (int)themesh.vertices.size(); i++) {
 		if (dist(themesh.vertices[i], pos) > thresh)
 			continue;
 
@@ -1282,14 +1321,14 @@ void ArapInteractor::selectTriangle(int x, int y, int button)
 void ArapInteractor::OnMouse(int button, int button_state, int x, int y, int vp)
 {
 	Point2D pos = Point2D((double)x, (double)y);
- 	double thresh = 15.0;
- 
-	
-	if (button_state == GLUT_UP && button ==  GLUT_LEFT_BUTTON) //0.15s
-	{   
+	double thresh = 15.0;
+
+
+	if (button_state == GLUT_UP && button == GLUT_LEFT_BUTTON) //0.15s
+	{
 		// left click to pick the approximated vertex
-		
-		for (int i = 0; i < (int)themesh.vertices.size(); i++){
+
+		for (int i = 0; i < (int)themesh.vertices.size(); i++) {
 			if (dist(themesh.vertices[i], pos) > thresh)
 				continue;
 
@@ -1297,9 +1336,9 @@ void ArapInteractor::OnMouse(int button, int button_state, int x, int y, int vp)
 				flags[i] = 1;
 			else
 				break;
-				
+
 			preStep1();
- 			preStep2();
+			preStep2();
 
 			break;
 		}
@@ -1308,18 +1347,18 @@ void ArapInteractor::OnMouse(int button, int button_state, int x, int y, int vp)
 
 		// Prepare for dragging
 
-		for (int i = 0; i < (int)themesh.vertices.size(); i++){
+		for (int i = 0; i < (int)themesh.vertices.size(); i++) {
 			if (dist(themesh.vertices[i], pos) > thresh || !flags[i])
 				continue;
 
 			ctrlPoints.push_back(i);
 		}
 	}
-	if(button_state == GLUT_UP && button ==  GLUT_RIGHT_BUTTON)
+	if (button_state == GLUT_UP && button == GLUT_RIGHT_BUTTON)
 	{
 		// right click to delete the control point
 
-		for (int i = 0; i < (int)themesh.vertices.size(); i++){
+		for (int i = 0; i < (int)themesh.vertices.size(); i++) {
 			if (dist(themesh.vertices[i], pos) > thresh)
 				continue;
 
@@ -1341,7 +1380,14 @@ void ArapInteractor::OnMouse(int button, int button_state, int x, int y, int vp)
 void ArapInteractor::OnKeyboard(unsigned char key, int x, int y)
 {
 	if (key == '1')
-		step1_only = !step1_only;
+	{
+		if(step1_only)step1_only = false;
+		else step1_only = true;
+	}
+	if (key == 'w') {
+		if (isWeight)isWeight = !isWeight;
+		else isWeight = true;
+	}
 	if (key == 'f')
 		show_fitted = !show_fitted;
 }
@@ -1362,19 +1408,19 @@ void OpenGLinitial()
 
 	GLfloat  ambientLight[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	GLfloat  diffuseLight[] = { 0.8f, 0.5f, 0.0f, 1.0f };
-	GLfloat  specular[] = { 0.6f, 0.6f, 0.6f, 1.0f};
-	GLfloat  Lposition[] = {0.0f, 10.0f, 0.0f , 1.0f};
+	GLfloat  specular[] = { 0.6f, 0.6f, 0.6f, 1.0f };
+	GLfloat  Lposition[] = { 0.0f, 10.0f, 0.0f , 1.0f };
 
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
-	glLightfv(GL_LIGHT0,GL_AMBIENT,ambientLight);
-	glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuseLight);
-	glLightfv(GL_LIGHT0,GL_SPECULAR,specular);
-	glLightfv(GL_LIGHT0,GL_POSITION,Lposition);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, Lposition);
 	glEnable(GL_LIGHT0);
 
-	glClearColor(1.0f , 1.0f , 1.0f , 1.0f);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
-void PanelResize(int width , int height)
+void PanelResize(int width, int height)
 {
 	if (height == 0)										    // Prevent A Divide By Zero By
 		height = 1;	    									    // Making Height Equal One
@@ -1389,7 +1435,7 @@ void PanelResize(int width , int height)
 	glMatrixMode(GL_MODELVIEW);							                    // Select The Modelview Matrix
 	glLoadIdentity();
 }
-void Render_Init(int width , int height)
+void Render_Init(int width, int height)
 {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -1399,10 +1445,10 @@ void Render_Init(int width , int height)
 	glPushMatrix();
 
 
-	glDisable( GL_DEPTH_TEST ) ;
+	glDisable(GL_DEPTH_TEST);
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glEnable(GL_COLOR_MATERIAL);
-          
+
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1410,10 +1456,10 @@ void Render_Init(int width , int height)
 	//glDisable(GL_BLEND);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluOrtho2D(0, width, height, 0);					// •≠¶Ê§ª≠±≈ÈßYView Volume =°]•™§UxÆyº–°A•k§WxÆyº–, •™§UyÆyº–,•k§WyÆyº–)
+	gluOrtho2D(0, width, height, 0);					// Âπ≥Ë°åÂÖ≠Èù¢È´îÂç≥View Volume =ÔºàÂ∑¶‰∏ãxÂ∫ßÊ®ôÔºåÂè≥‰∏äxÂ∫ßÊ®ô, Â∑¶‰∏ãyÂ∫ßÊ®ô,Âè≥‰∏äyÂ∫ßÊ®ô)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glViewport(0, 0, width, height);					// µ°§f§j§p =°]•™§UxÆyº–°A•™§UyÆyº–, ºe, ∞™)
-	glTranslated(50,50,0);
+	glViewport(0, 0, width, height);					// Á™óÂè£Â§ßÂ∞è =ÔºàÂ∑¶‰∏ãxÂ∫ßÊ®ôÔºåÂ∑¶‰∏ãyÂ∫ßÊ®ô, ÂØ¨, È´ò)
+	glTranslated(50, 50, 0);
 
 }
