@@ -21,7 +21,7 @@ using namespace std;
 
 // LU decomposition
 template <class T, int N>
-static inline bool ludcmp(T a[N][N], int indx[N], T *d = NULL)
+static inline bool ludcmp(T a[N][N], int indx[N], T* d = NULL)
 {
 	int i, j, k;
 	T vv[N];
@@ -43,15 +43,15 @@ static inline bool ludcmp(T a[N][N], int indx[N], T *d = NULL)
 		for (i = 0; i < j; i++) {
 			T sum = a[i][j];
 			for (k = 0; k < i; k++)
-				sum -= a[i][k]*a[k][j];
-			a[i][j]=sum;
+				sum -= a[i][k] * a[k][j];
+			a[i][j] = sum;
 		}
 		T big = 0.0;
 		int imax = j;
 		for (i = j; i < N; i++) {
 			T sum = a[i][j];
 			for (k = 0; k < j; k++)
-				sum -= a[i][k]*a[k][j];
+				sum -= a[i][k] * a[k][j];
 			a[i][j] = sum;
 			T tmp = vv[i] * fabs(sum);
 			if (tmp > big) {
@@ -69,9 +69,9 @@ static inline bool ludcmp(T a[N][N], int indx[N], T *d = NULL)
 		indx[j] = imax;
 		if (a[j][j] == 0.0)
 			return false;
-		if (j != N-1) {
-			T tmp = 1.0/(a[j][j]);
-			for (i = j+1; i < N; i++)
+		if (j != N - 1) {
+			T tmp = 1.0 / (a[j][j]);
+			for (i = j + 1; i < N; i++)
 				a[i][j] *= tmp;
 		}
 	}
@@ -95,9 +95,9 @@ static inline void lubksb(T a[N][N], int indx[N], T b[N])
 			ii = i;
 		b[i] = sum;
 	}
-	for (i = N-1; i >= 0; i--) {
+	for (i = N - 1; i >= 0; i--) {
 		T sum = b[i];
-		for (j = i+1; j < N; j++)
+		for (j = i + 1; j < N; j++)
 			sum -= a[i][j] * b[j];
 		b[i] = sum / a[i][i];
 	}
@@ -111,16 +111,16 @@ static inline void inverse(T a[N][N]) {
 
 	ludcmp<double, N>(a, indx, &d);
 	for (j = 0; j < N; j++) {
-		for (i = 0;i < N; i++)
+		for (i = 0; i < N; i++)
 			col[i] = 0.0;
 		col[j] = 1.0;
 		lubksb<double, N>(a, indx, col);
-		for(i = 0; i < N; i++)
+		for (i = 0; i < N; i++)
 			y[i][j] = col[i];
 	}
 
 	// copy back
-	for ( int i = 0; i < N; i++)
+	for (int i = 0; i < N; i++)
 		for (int j = 0; j < N; j++)
 			a[i][j] = y[i][j];
 }
@@ -150,7 +150,7 @@ static void mul(T A[M][N], T v[N], T b[M])
 {
 	for (int i = 0; i < M; i++)
 		for (int j = 0; j < N; j++)
-			b[i] += A[i][j]*v[j];
+			b[i] += A[i][j] * v[j];
 }
 
 // Transpose
@@ -167,16 +167,16 @@ static void transpose(T m[M][N], T mt[N][M])
 template <class T>
 T* new_vec(int n) {
 	T* a = new T[n];
-	memset(a, 0, sizeof(T)*n);
+	memset(a, 0, sizeof(T) * n);
 	return a;
 }
 
 template <class T>
 T** new_matrix(int m, int n) {
-	T**a = new T*[m];
-	for (int i = 0; i < m; i++){
+	T** a = new T * [m];
+	for (int i = 0; i < m; i++) {
 		a[i] = new T[n];
-		memset(a[i], 0, sizeof(T)*n);
+		memset(a[i], 0, sizeof(T) * n);
 	}
 
 	return a;
@@ -193,8 +193,8 @@ void delete_matrix(T** a, int m) {
 
 template <class T>
 T* copy(T* a, int n) {
-	T *a1 = new T[n];
-	memcpy(a1, a, sizeof(T)*n);
+	T* a1 = new T[n];
+	memcpy(a1, a, sizeof(T) * n);
 	return a1;
 }
 
@@ -207,10 +207,10 @@ void copy(T a[M][N], T d[M][N]) {
 
 template <class T>
 T** copy(T** a, int m, int n) {
-	T **a1 = new T*[m];
+	T** a1 = new T * [m];
 	for (int i = 0; i < m; i++) {
 		a1[i] = new T[n];
-		memcpy(a1[i], a[i], sizeof(T)*n);
+		memcpy(a1[i], a[i], sizeof(T) * n);
 	}
 	return a1;
 }
@@ -245,106 +245,130 @@ public:
 	// Constructor for 1-4 arguments.  Ugly, but the compiler *should*
 	// optimize away the ifs and unroll the for...  This one's explicit.
 	explicit Vec(T x, T y = T(0), T z = T(0), T w = T(0))
-	{ v[0] = x;  if (D > 1) v[1] = y;
-	if (D > 2) v[2] = z;  if (D > 3) v[3] = w;
-	for (int i = 4; i < D; i++) v[i] = T(0); }
+	{
+		v[0] = x;  if (D > 1) v[1] = y;
+		if (D > 2) v[2] = z;  if (D > 3) v[3] = w;
+		for (int i = 4; i < D; i++) v[i] = T(0);
+	}
 
 	// Array reference and conversion to pointer - no bounds checking
-	const T &operator [] (int i) const
-	{ return v[i]; }
-	T &operator [] (int i)
-	{ return v[i]; }
-	operator const T * () const
-	{ return v; }
-	operator const T * ()
-	{ return v; }
-	operator T * ()
-	{ return v; }
+	const T& operator [] (int i) const
+	{
+		return v[i];
+	}
+	T& operator [] (int i)
+	{
+		return v[i];
+	}
+	operator const T* () const
+	{
+		return v;
+	}
+	operator const T* ()
+	{
+		return v;
+	}
+	operator T* ()
+	{
+		return v;
+	}
 
 	// Member operators
-	Vec<D,T> &operator += (const Vec<D,T> &x)
-	{ for (int i = 0; i < D; i++) v[i] += x[i];  return *this; }
-	Vec<D,T> &operator -= (const Vec<D,T> &x)
-	{ for (int i = 0; i < D; i++) v[i] -= x[i];  return *this; }
-	Vec<D,T> &operator *= (const Vec<D,T> &x)
-	{ for (int i = 0; i < D; i++) v[i] *= x[i];  return *this; }
-	Vec<D,T> &operator *= (const T &x)
-	{ for (int i = 0; i < D; i++) v[i] *= x;     return *this; }
-	Vec<D,T> &operator /= (const Vec<D,T> &x)
-	{ for (int i = 0; i < D; i++) v[i] /= x[i];  return *this; }
-	Vec<D,T> &operator /= (const T &x)
-	{ for (int i = 0; i < D; i++) v[i] /= x;     return *this; }
+	Vec<D, T>& operator += (const Vec<D, T>& x)
+	{
+		for (int i = 0; i < D; i++) v[i] += x[i];  return *this;
+	}
+	Vec<D, T>& operator -= (const Vec<D, T>& x)
+	{
+		for (int i = 0; i < D; i++) v[i] -= x[i];  return *this;
+	}
+	Vec<D, T>& operator *= (const Vec<D, T>& x)
+	{
+		for (int i = 0; i < D; i++) v[i] *= x[i];  return *this;
+	}
+	Vec<D, T>& operator *= (const T& x)
+	{
+		for (int i = 0; i < D; i++) v[i] *= x;     return *this;
+	}
+	Vec<D, T>& operator /= (const Vec<D, T>& x)
+	{
+		for (int i = 0; i < D; i++) v[i] /= x[i];  return *this;
+	}
+	Vec<D, T>& operator /= (const T& x)
+	{
+		for (int i = 0; i < D; i++) v[i] /= x;     return *this;
+	}
 
 	// Outside of class: + - * / dist
 };
 
 // Nonmember operators that take two Vecs
 template <int D, class T>
-static inline const Vec<D,T> operator + (const Vec<D,T> &v1, const Vec<D,T> &v2)
+static inline const Vec<D, T> operator + (const Vec<D, T>& v1, const Vec<D, T>& v2)
 {
-	return Vec<D,T>(v1) += v2;
+	return Vec<D, T>(v1) += v2;
 }
 
 template <int D, class T>
-static inline const Vec<D,T> operator - (const Vec<D,T> &v1, const Vec<D,T> &v2)
+static inline const Vec<D, T> operator - (const Vec<D, T>& v1, const Vec<D, T>& v2)
 {
-	return Vec<D,T>(v1) -= v2;
+	return Vec<D, T>(v1) -= v2;
 }
 
 // Vec/scalar operators
 template <int D, class T>
-static inline const Vec<D,T> operator * (const T &x, const Vec<D,T> &v)
+static inline const Vec<D, T> operator * (const T& x, const Vec<D, T>& v)
 {
-	Vec<D,T> result(v);
+	Vec<D, T> result(v);
 	for (int i = 0; i < D; i++)
 		result[i] = x * result[i];
 	return result;
 }
 
 template <int D, class T>
-static inline const Vec<D,T> operator * (const Vec<D,T> &v, const T &x)
+static inline const Vec<D, T> operator * (const Vec<D, T>& v, const T& x)
 {
-	return Vec<D,T>(v) *= x;
+	return Vec<D, T>(v) *= x;
 }
 
 template <int D, class T>
-static inline const Vec<D,T> operator / (const T &x, const Vec<D,T> &v)
+static inline const Vec<D, T> operator / (const T& x, const Vec<D, T>& v)
 {
-	Vec<D,T> result(v);
+	Vec<D, T> result(v);
 	for (int i = 0; i < D; i++)
 		result[i] = x / result[i];
 	return result;
 }
 
 template <int D, class T>
-static inline const Vec<D,T> operator / (const Vec<D,T> &v, const T &x)
+static inline const Vec<D, T> operator / (const Vec<D, T>& v, const T& x)
 {
-	return Vec<D,T>(v) /= x;
+	return Vec<D, T>(v) /= x;
 }
 
 // Other functions
 
 // Unitility functions first
 template <class T>
-static inline T sqr(const T &x)
+static inline T sqr(const T& x)
 {
-	return x*x;
+	return x * x;
 }
 
 template <int D, class T>
-static inline const T dist2(const Vec<D,T> &v1, const Vec<D,T> &v2)
+static inline const T dist2(const Vec<D, T>& v1, const Vec<D, T>& v2)
 {
-	T d2 = sqr(v2[0]-v1[0]);
+	T d2 = sqr(v2[0] - v1[0]);
 	for (int i = 1; i < D; i++)
-		d2 += sqr(v2[i]-v1[i]);
+		d2 += sqr(v2[i] - v1[i]);
 	return d2;
 }
 
 // Euclidean distance between two points
 template <int D, class T>
-static inline const T dist(const Vec<D,T> &v1, const Vec<D,T> &v2)
+static inline const T dist(const Vec<D, T>& v1, const Vec<D, T>& v2)
 {
-	return sqrt(dist2(v1,v2));
+	return sqrt(dist2(v1, v2));
 }
 
 
@@ -381,67 +405,67 @@ class SparseMatrix
 public:
 	// m:	number of rows
 	// n:	number of columns
-    SparseMatrix(int m = 0, int n = 0);
-    SparseMatrix(const SparseMatrix& B);
-    ~SparseMatrix();
+	SparseMatrix(int m = 0, int n = 0);
+	SparseMatrix(const SparseMatrix& B);
+	~SparseMatrix();
 
-    void resetDim(int m, int n);
+	void resetDim(int m, int n);
 
 
 public:
-    // Memeber reference
-    double operator() (int i, int j) const;
-    double& operator() (int i, int j);
-
-    // Formated output, for debugging
-    //void print(FILE* f) const;
-    void print();
+	// Memeber reference
+	double operator() (int i, int j) const;
+	double& operator() (int i, int j);
+	
+	// Formated output, for debugging
+	//void print(FILE* f) const;
+	void print();
 public:
-    // algebra
-    SparseMatrix transpose() const;
-    SparseMatrix operator + (const SparseMatrix& B) const;
+	// algebra
+	SparseMatrix transpose() const;
+	SparseMatrix operator + (const SparseMatrix& B) const;
 
-    // Multiplication, using own implementation
-    vector<double> operator * (const vector<double>& x) const;
+	// Multiplication, using own implementation
+	vector<double> operator * (const vector<double>& x) const;
 
-    // solve Ax = b for x
-    vector<double> solve(const vector<double>& b);
+	// solve Ax = b for x
+	vector<double> solve(const vector<double>& b);
 
-    int m_rows;
-    int n_cols;
+	int m_rows;
+	int n_cols;
 
-    iset_map m_row_indices;
-    iset_map m_col_indices;
+	iset_map m_row_indices;
+	iset_map m_col_indices;
 
-    void PreSaveMatrix();
-    double get( int i, int j ) const;
+	void PreSaveMatrix();
+	double get(int i, int j) const;
 
-    ublas::compressed_matrix<double, 
-	    ublas::column_major, 
-	    0,
-	    ublas::unbounded_array<int>, 
-	    ublas::unbounded_array<double> > PreSave;
-    matrix_map SMatrix_data;
+	ublas::compressed_matrix<double,
+		ublas::column_major,
+		0,
+		ublas::unbounded_array<int>,
+		ublas::unbounded_array<double> > PreSave;
+	matrix_map SMatrix_data;
 
 };
 // Another place holder that expects your implementation
 class ShapeView
 {
 public:
-	virtual Point2D window2world(const Point2D& win_pt)=0;
-	virtual double window2world(double win_len)=0;
-	virtual Point2D world2window(const Point2D& pos)=0;
-	
+	virtual Point2D window2world(const Point2D& win_pt) = 0;
+	virtual double window2world(double win_len) = 0;
+	virtual Point2D world2window(const Point2D& pos) = 0;
+
 	// Post an update-draw function
-	virtual void refresh() =0;
+	virtual void refresh() = 0;
 
 public:
 	enum ButtonState {
-		LBUTTON_DOWN = (1<<GLUT_LEFT_BUTTON),
-		MBUTTON_DOWN = (1<<GLUT_MIDDLE_BUTTON),
-		RBUTTON_DOWN = (1<<GLUT_RIGHT_BUTTON)
+		LBUTTON_DOWN = (1 << GLUT_LEFT_BUTTON),
+		MBUTTON_DOWN = (1 << GLUT_MIDDLE_BUTTON),
+		RBUTTON_DOWN = (1 << GLUT_RIGHT_BUTTON)
 	};
-	ButtonState get_button_state() ;
+	ButtonState get_button_state();
 	void button_state(int state);
 private:
 	int b_state;
@@ -456,7 +480,7 @@ class TriMesh2D
 public:
 	vector<Point2D> vertices;
 	vector<Tri> tris;
-	vector<int> normals;//1¥¿  -1­t
+	vector<int> normals;//1Â¥Â¿  -1Â­t
 
 public:
 	void compute_normal();
@@ -483,6 +507,8 @@ public:
 	// Indicates if it currently under dragging
 	vector<int> ctrlPoints;
 	bool beingDragged;
+
+	
 
 	// Algorithm
 	void step1();
@@ -512,14 +538,14 @@ public:
 public:
 	ArapInteractor(ShapeView* view, const TriMesh2D& mesh);
 	virtual ~ArapInteractor(void);
-
+	
 public:
 	const char* get_string() { return "ARAP"; }
-
+	
 	void OnDraw(int vp = -1);
 	void OnDisplay();
 	void OnDrawInfo(int vp = -1);
-	bool OnMotion(int x, int y, int flag,bool mouse_down=0, int vp = -1);
+	bool OnMotion(int x, int y, int flag, bool mouse_down = 0, int vp = -1);
 	void OnMouse(int button, int button_state, int x, int y, int vp = -1);
 	void OnKeyboard(unsigned char key, int x, int y);
 	void OnSpecialKey(int key, int x, int y);
@@ -529,6 +555,6 @@ public:
 	void selectTriangle(int x, int y, int button);
 };
 void OpenGLinitial();
-void PanelResize(int width , int height);
-void Render_Init(int width , int height);
- #endif
+void PanelResize(int width, int height);
+void Render_Init(int width, int height);
+#endif

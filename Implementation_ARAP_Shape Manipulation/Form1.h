@@ -21,16 +21,16 @@
 
 #pragma region Application variables
 
-vavImage	  *ImageEdge=NULL;	   //find contour
-TriangulationCgal *Triangulate=NULL;	   //Delaunay triangulation	
+vavImage* ImageEdge = NULL;	   //find contour
+TriangulationCgal* Triangulate = NULL;	   //Delaunay triangulation	
 
-TriMesh2D	  *test_1=NULL, *savedTest=NULL;		   	
-ShapeView	  *ShapeView_Object=NULL;
-ArapInteractor    *Arap=NULL;
+TriMesh2D* test_1 = NULL, *savedTest=NULL;
+ShapeView* ShapeView_Object = NULL;
+ArapInteractor* Arap = NULL;
 
-int		  flag=-1;
-int		  mouseX,mouseY;
-
+int		  flag = -1;
+int		  mouseX, mouseY;
+bool isweightopen = false;
 extern bool step1_only;
 extern bool show_fitted;
 extern bool depth;
@@ -74,7 +74,7 @@ namespace As_rigid_as_test {
 			//TODO: Add the constructor code here
 			test_1 = new TriMesh2D;
 			savedTest = new TriMesh2D;
-			ImageEdge= new vavImage;
+			ImageEdge = new vavImage;
 			
 
 			//
@@ -92,28 +92,22 @@ namespace As_rigid_as_test {
 			}
 		}
 
-	protected: 
+	protected:
 
-	private: HKOGLPanel::HKOGLPanelControl^  hkoglPanelControl1;
+	private: HKOGLPanel::HKOGLPanelControl^ hkoglPanelControl1;
 
-	private: System::Windows::Forms::Button^  button2;
-	private: System::Windows::Forms::Button^  button3;
-
-
+	private: System::Windows::Forms::Button^ button2;
+	private: System::Windows::Forms::Button^ button3;
 	private: System::Windows::Forms::CheckBox^ depth;
 	private: System::Windows::Forms::CheckBox^ weight;
-	private: System::Windows::Forms::CheckBox^ curve;
-	private: System::Windows::Forms::CheckBox^ peekinginterface;
 	private: System::Windows::Forms::CheckBox^ Scale;
+
 	private: System::Windows::Forms::CheckBox^ fit;
 	private: System::Windows::Forms::Button^ start_anime;
 	private: System::Windows::Forms::Button^ record_anime;
 	private: System::Windows::Forms::Button^ stop_anime;
 
-
-
-
-	private: System::ComponentModel::IContainer^  components;
+	private: System::ComponentModel::IContainer^ components;
 
 	private:
 		/// <summary>
@@ -135,8 +129,6 @@ namespace As_rigid_as_test {
 			this->button3 = (gcnew System::Windows::Forms::Button());
 			this->depth = (gcnew System::Windows::Forms::CheckBox());
 			this->weight = (gcnew System::Windows::Forms::CheckBox());
-			this->curve = (gcnew System::Windows::Forms::CheckBox());
-			this->peekinginterface = (gcnew System::Windows::Forms::CheckBox());
 			this->Scale = (gcnew System::Windows::Forms::CheckBox());
 			this->fit = (gcnew System::Windows::Forms::CheckBox());
 			this->start_anime = (gcnew System::Windows::Forms::Button());
@@ -204,26 +196,7 @@ namespace As_rigid_as_test {
 			this->weight->TabIndex = 16;
 			this->weight->Text = L"weight";
 			this->weight->UseVisualStyleBackColor = true;
-			// 
-			// curve
-			// 
-			this->curve->AutoSize = true;
-			this->curve->Location = System::Drawing::Point(12, 449);
-			this->curve->Name = L"curve";
-			this->curve->Size = System::Drawing::Size(50, 16);
-			this->curve->TabIndex = 17;
-			this->curve->Text = L"curve";
-			this->curve->UseVisualStyleBackColor = true;
-			// 
-			// peekinginterface
-			// 
-			this->peekinginterface->AutoSize = true;
-			this->peekinginterface->Location = System::Drawing::Point(12, 481);
-			this->peekinginterface->Name = L"peekinginterface";
-			this->peekinginterface->Size = System::Drawing::Size(104, 16);
-			this->peekinginterface->TabIndex = 18;
-			this->peekinginterface->Text = L"peeking interface";
-			this->peekinginterface->UseVisualStyleBackColor = true;
+			this->weight->CheckedChanged += gcnew System::EventHandler(this, &Form1::weight_CheckedChanged);
 			// 
 			// Scale
 			// 
@@ -292,8 +265,6 @@ namespace As_rigid_as_test {
 			this->Controls->Add(this->record_anime);
 			this->Controls->Add(this->start_anime);
 			this->Controls->Add(this->Scale);
-			this->Controls->Add(this->peekinginterface);
-			this->Controls->Add(this->curve);
 			this->Controls->Add(this->weight);
 			this->Controls->Add(this->depth);
 			this->Controls->Add(this->fit);
@@ -307,132 +278,134 @@ namespace As_rigid_as_test {
 
 		}
 #pragma endregion
-private: System::Void hkoglPanelControl1_Paint(System::Object^  sender, System::Windows::Forms::PaintEventArgs^  e) {
-		 Render_Init(hkoglPanelControl1->Size.Width, hkoglPanelControl1->Size.Height);
-		 if(Current_Display.openImg)
-		 {
-			 ImageEdge->drawImage();
-		 }
-		 if(Current_Display.triangulation)
-		 {
-			 Arap->OnDraw(); 
-		 }
-	 }
-private: System::Void hkoglPanelControl1_Load(System::Object^  sender, System::EventArgs^  e) {
-		 OpenGLinitial();
-		 PanelResize(hkoglPanelControl1->Size.Width , hkoglPanelControl1->Size.Height);
-	 }
-private: System::Void hkoglPanelControl1_MouseMove(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-		 if(e->Button==System::Windows::Forms::MouseButtons::Left)//move the control point
-		 {
-			 if(flag!=-1)
-			 {
-				 //std::cout<<"position X:"<<e->X<<" Y:"<<e->Y<<std::endl;
-				 //==========================
+	private: System::Void hkoglPanelControl1_Paint(System::Object^  sender, System::Windows::Forms::PaintEventArgs^  e) {
+		Render_Init(hkoglPanelControl1->Size.Width, hkoglPanelControl1->Size.Height);
+		if(Current_Display.openImg)
+		{
+			ImageEdge->drawImage();
+		}
+		if(Current_Display.triangulation)
+		{
+			Arap->OnDraw(); 
+		}
+	}
+	private: System::Void hkoglPanelControl1_Load(System::Object^  sender, System::EventArgs^  e) {
+		OpenGLinitial();
+		PanelResize(hkoglPanelControl1->Size.Width , hkoglPanelControl1->Size.Height);
+	}
+	private: System::Void hkoglPanelControl1_MouseMove(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+		if (e->Button == System::Windows::Forms::MouseButtons::Left)//move the control point
+		{
+			if (flag != -1)
+			{
+				//std::cout<<"position X:"<<e->X<<" Y:"<<e->Y<<std::endl;
+				//==========================
 // 				 clock_t start, finish;
 // 				 start = clock();
 				 //==========================
-				 while (!Arap->OnMotion(e->X - 50, e->Y - 50, flag, 1, 1)) {//0.008s
-					 hkoglPanelControl1->Refresh();
-				 }
-				 hkoglPanelControl1->Invalidate();
-				 MoveAction newAction = { flag, e->X - 50, e->Y - 50 };
-				 actions.push_back(newAction);
-				 //==============================
+				while (!Arap->OnMotion(e->X - 50, e->Y - 50, flag, 1, 1)) {//0.008s
+					hkoglPanelControl1->Refresh();
+				}
+				hkoglPanelControl1->Invalidate();
+				MoveAction newAction = { flag, e->X - 50, e->Y - 50 };
+				actions.push_back(newAction);
+
+				//==============================
 // 				 finish = clock();
 // 				 cout <<"Time Consume :" <<(double)(finish - start) / CLOCKS_PER_SEC<<endl;
 				 //==============================
-			 }
-			 else {
-				 Arap->selectTriangle(e->X - 50, e->Y - 50, 1);
-			 }
-		 }
-		 if (e->Button == System::Windows::Forms::MouseButtons::Right) {
-			 if (flag == -1) {
-				 Arap->selectTriangle(e->X - 50, e->Y - 50, 2);
-			 }
-		 }
+			}
+			else if(isweightopen){
+				Arap->selectTriangle(e->X - 50, e->Y - 50, 1);
+			}
+		}
+		if (e->Button == System::Windows::Forms::MouseButtons::Right) {
+			if ((flag == -1)&& (isweightopen == true)) {
+				Arap->selectTriangle(e->X - 50, e->Y - 50, 2);
+			}
+		}
+	}
+	private: System::Void hkoglPanelControl1_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		if (e->Button == System::Windows::Forms::MouseButtons::Left && mouseX == e->X && mouseY == e->Y)//add the control point
+		{
+			Arap->OnMouse(0, 1, e->X - 50, e->Y - 50);
+		}
+		if (e->Button == System::Windows::Forms::MouseButtons::Right)				  //delete the control point
+		{
+			Arap->OnMouse(2, 1, e->X - 50, e->Y - 50);
+		}
+		hkoglPanelControl1->Invalidate();
+	}
+	private: System::Void hkoglPanelControl1_MouseDown(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		if (e->Button == System::Windows::Forms::MouseButtons::Left)
+		{
+			mouseX = e->X;
+			mouseY = e->Y;
+			flag = Arap->getVertex(e->X - 50, e->Y - 50);						 //get control point ID
+		}
+	}
+private: System::Void button2_Click_1(System::Object^ sender, System::EventArgs^ e) {//open image 
+		Current_Display.openImg = 1;
+		ImageEdge->ReadImage("gingerbread_man.bmp");
+		*ImageEdge = (ImageEdge->CannyEdge());
 
-	 }
-private: System::Void hkoglPanelControl1_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-		 if(e->Button==System::Windows::Forms::MouseButtons::Left && mouseX==e->X && mouseY==e->Y)//add the control point
-		 {	
-			 Arap->OnMouse(0,1,e->X-50,e->Y-50);
-		 }
-		 if(e->Button==System::Windows::Forms::MouseButtons::Right)				  //delete the control point
-		 {
-			 Arap->OnMouse(2,1,e->X-50,e->Y-50);
-		 }
-		 hkoglPanelControl1->Invalidate();
-	 }
-private: System::Void hkoglPanelControl1_MouseDown(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-		 if(e->Button==System::Windows::Forms::MouseButtons::Left)
-		 {
-			mouseX=e->X;
-			mouseY=e->Y;
-			flag=Arap->getVertex(e->X-50,e->Y-50);						 //get control point ID
-		 }
-	 }
-private: System::Void button2_Click_1(System::Object^  sender, System::EventArgs^  e) {//open image 
-		 Current_Display.openImg=1;
-		 ImageEdge->ReadImage("full_guys_mask.png");
-		 *ImageEdge = (ImageEdge->CannyEdge());
-	 
-		 std::cout<<"Load img :"<<ImageEdge->GetHeight()<<"*"<<ImageEdge->GetWidth()<<std::endl;
-	 
-		 hkoglPanelControl1->Invalidate();
-	 }
-private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e) {//CGAL Delaunay Triangulation
-		 if(Current_Display.openImg)
-		 {
-			 Current_Display.triangulation=1;
-			 Current_Display.openImg=0;
-			 Triangulate=new TriangulationCgal;
-			 Triangles Tris;
-			 Vector2s meshPointset;
-			 Vector2s ContourPoint=ImageEdge->GetContour();
+		std::cout << "Load img :" << ImageEdge->GetHeight() << "*" << ImageEdge->GetWidth() << std::endl;
 
-			 for(int i=0;i<ContourPoint.size();i+=15)
-			 {
-				  Triangulate->AddPoint(ContourPoint[i][0],ContourPoint[i][1]);
-			 }
+		hkoglPanelControl1->Invalidate();
+	}
+	private: System::Void button3_Click(System::Object^ sender, System::EventArgs^ e) {//CGAL Delaunay Triangulation
+		if (Current_Display.openImg)
+		{
+			Current_Display.triangulation = 1;
+			Current_Display.openImg = 0;
+			Triangulate = new TriangulationCgal;
+			Triangles Tris;
+			Vector2s meshPointset;
+			Vector2s ContourPoint = ImageEdge->GetContour();
 
-			 Triangulate->DelaunayMesher2();
-			 meshPointset=Triangulate->MeshPointSet();
+			for (int i = 0; i < ContourPoint.size(); i += 15)
+			{
+				Triangulate->AddPoint(ContourPoint[i][0], ContourPoint[i][1]);
+			}
 
-			 for(int i=0 ;i < meshPointset.size() ; i++ )
-			 {
-				 test_1->vertices.push_back(Point2D(meshPointset[i][0],meshPointset[i][1]));
-			 }
+			Triangulate->DelaunayMesher2();
+			meshPointset = Triangulate->MeshPointSet();
 
- 			 Tris=Triangulate->GetTriangles();
- 			 std::cout<<"Tris.size() :"<<Tris.size()<<std::endl;
-			 Tri v;
-			 for(int i=0;i<Tris.size();i++)
-			 {
-				 if(!ImageEdge->IsinsidePoint(Tris[Tris.size()-1-i].m_Points[0][0],Tris[Tris.size()-1-i].m_Points[0][1],
-					 Tris[Tris.size()-1-i].m_Points[1][0],Tris[Tris.size()-1-i].m_Points[1][1],
-					 Tris[Tris.size()-1-i].m_Points[2][0],Tris[Tris.size()-1-i].m_Points[2][1]))
- 					 continue;
-				 for(int j=0;j<3;j++)
-				 {
-					 v[j]=Triangulate->getVertexID(Tris[Tris.size()-1-i].m_Points[j][0],Tris[Tris.size()-1-i].m_Points[j][1]);
-				 }
+			for (int i = 0; i < meshPointset.size(); i++)
+			{
+				test_1->vertices.push_back(Point2D(meshPointset[i][0], meshPointset[i][1]));
+			}
+
+			Tris = Triangulate->GetTriangles();
+			std::cout << "Tris.size() :" << Tris.size() << std::endl;
+			Tri v;
+			for (int i = 0; i < Tris.size(); i++)
+			{
+				if (!ImageEdge->IsinsidePoint(Tris[Tris.size() - 1 - i].m_Points[0][0], Tris[Tris.size() - 1 - i].m_Points[0][1],
+					Tris[Tris.size() - 1 - i].m_Points[1][0], Tris[Tris.size() - 1 - i].m_Points[1][1],
+					Tris[Tris.size() - 1 - i].m_Points[2][0], Tris[Tris.size() - 1 - i].m_Points[2][1]))
+					continue;
+				for (int j = 0; j < 3; j++)
+				{
+					v[j] = Triangulate->getVertexID(Tris[Tris.size() - 1 - i].m_Points[j][0], Tris[Tris.size() - 1 - i].m_Points[j][1]);
+				}
 				test_1->tris.push_back(v);
-			 }
- 			 Arap= new ArapInteractor(ShapeView_Object,*test_1);
+			}
+			Arap = new ArapInteractor(ShapeView_Object, *test_1);
 
-		 }
-		 hkoglPanelControl1->Invalidate();
-	 }
-private: System::Void fit_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
-	// Arap->OnKeyboard('f', 0.05, 0.05);
-	show_fitted = this->fit->Checked;
-}
-private: System::Void Scale_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
-	Arap->OnKeyboard('1',1,1 );
-	step1_only = !this->Scale->Checked;
-}
+		}
+		hkoglPanelControl1->Invalidate();
+	}
+	private: System::Void fit_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
+		show_fitted = this->fit->Checked;
+	}
+	private: System::Void Scale_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
+		step1_only = !this->Scale->Checked;
+	}
+	private: System::Void weight_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
+		isweightopen = true;
+		Arap->OnKeyboard('w', 1, 1);
+	}
 
 private: System::Void start_anime_Click(System::Object^ sender, System::EventArgs^ e) {
 	for (int i = 0; i < test_1->vertices.size(); i++)
@@ -444,7 +417,7 @@ private: System::Void start_anime_Click(System::Object^ sender, System::EventArg
 	for (int i = 0; i < actions.size(); i++) {
 		while (!Arap->OnMotion(actions[i].X, actions[i].Y, actions[i].flag, 1, 1)) {//0.008s
 			hkoglPanelControl1->Refresh();
-			Sleep(50);
+			Sleep(40);
 		}
 	}
 	hkoglPanelControl1->Invalidate();
