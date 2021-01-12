@@ -472,6 +472,7 @@ class ArapInteractor
 	vector<Point2D> boundary;
 	TriMesh2D themesh;
 	vector<Point2D> baseVertices;
+	vector<bool> selectedTri;
 
 	// Indicate the state of each vertices
 	//	0:	clear
@@ -524,6 +525,7 @@ public:
 
 	//get the selected vertex position
 	int getVertex(int x, int y);
+	void selectTriangle(int x, int y, int button);
 };
 void OpenGLinitial();
 void PanelResize(int width , int height);
