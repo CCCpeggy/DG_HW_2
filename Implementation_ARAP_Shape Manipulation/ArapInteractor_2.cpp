@@ -47,7 +47,8 @@ void TriMesh2D::draw(bool linemode)
 			vector<double> tmp;
 			tmp.push_back(vertices[i][0]);
 			tmp.push_back(vertices[i][1]);
-			tmp.push_back(vertices[i][0] * 0.0001 + vertices[i][1] * 0.00002);
+			tmp.push_back(0);
+			//tmp.push_back(vertices[i][0] * 0.0001 + vertices[i][1] * 0.00002);
 			tmpVertices.push_back(tmp);
 		}
 		glVertexPointer(3, GL_DOUBLE, 0, &tmpVertices[0][0]);
