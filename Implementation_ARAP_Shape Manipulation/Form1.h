@@ -30,8 +30,12 @@ ArapInteractor    *Arap=NULL;
 
 int		  flag=-1;
 int		  mouseX,mouseY;
-extern int step1_only;
-extern int show_fitted;
+
+extern bool step1_only;
+extern bool show_fitted;
+extern bool depth;
+extern bool animation;
+extern bool peeking;
 
 struct Mode_Display {
 	bool openImg;
@@ -301,7 +305,15 @@ private: System::Void hkoglPanelControl1_MouseMove(System::Object^  sender, Syst
 // 				 cout <<"Time Consume :" <<(double)(finish - start) / CLOCKS_PER_SEC<<endl;
 				 //==============================
 				 hkoglPanelControl1->Invalidate();
-			 }		
+			 }
+			 else {
+				 Arap->selectTriangle(e->X - 50, e->Y - 50, 1);
+			 }
+		 }
+		 if (e->Button == System::Windows::Forms::MouseButtons::Right) {
+			 if (flag == -1) {
+				 Arap->selectTriangle(e->X - 50, e->Y - 50, 2);
+			 }
 		 }
 
 	 }

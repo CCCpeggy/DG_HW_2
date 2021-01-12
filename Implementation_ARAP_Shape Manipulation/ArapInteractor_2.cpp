@@ -16,8 +16,11 @@ using namespace std;
 // This allows you to customize the deformer - if you don't understand,
 // read that Igarashi's paper first :)
 
-int step1_only = false;
-int show_fitted = false;
+bool step1_only = false;
+bool show_fitted = false;
+bool depth = false;
+bool animation = false;
+bool peeking = false;
 
 #define ARAP_DO_VERIFY	0
 
@@ -335,7 +338,8 @@ ArapInteractor::ArapInteractor(ShapeView* view, const TriMesh2D& mesh)
 	// Reset the states
 	flags.resize(themesh.vertices.size(), 0);
 	savelastFlagsPosition.resize(themesh.vertices.size(),Point2D((double)0, (double)0));//!!
-
+	selectedTri.resize(themesh.tris.size(), false);
+	
 	beingDragged = false;
 	preCompG();
 	preCompF();
@@ -650,7 +654,6 @@ void ArapInteractor::preStep1()
 
 void ArapInteractor::step1()
 {
-
 	// Compute q
 
 	vector<double> q, Bq;
@@ -933,7 +936,7 @@ void ArapInteractor::preStep2()//0.05
 			for (int k = 0; k < 3; k++) {
 				SparseMatrix* HH = NULL;
 				// Non-zeros could only be the diagonal entries 
-				if (!flags[t[j]] && !flags[t[k]])
+				if (!flags[t[j]] && !flags[t[k]]) 
 					HH = &H00;
 				else if (!flags[t[j]] && flags[t[k]])
 					HH = &H01;
@@ -941,7 +944,7 @@ void ArapInteractor::preStep2()//0.05
 					HH = &H10;
 				else // if (flags[t[j]] && flags[t[k]])
 					HH = &H11;
-
+				
 				(*HH)(m[j]*2,   m[k]*2)   = BigH(t[j]*2,   t[k]*2);
 				(*HH)(m[j]*2+1, m[k]*2)   = BigH(t[j]*2+1, t[k]*2);
 				(*HH)(m[j]*2,   m[k]*2+1) = BigH(t[j]*2,   t[k]*2+1);
@@ -959,7 +962,6 @@ void ArapInteractor::preStep2()//0.05
 
 void ArapInteractor::step2()//0.6
 {
-
 	// Compute C
 
 	// For each triangle
@@ -1083,7 +1085,7 @@ void ArapInteractor::step2()//0.6
 		Dq_plus_f0[i] -= f0[i];
 		Dq_plus_f0[i] = -Dq_plus_f0[i];
 	}
-
+	
 	vector<double> u = Hprime.solve(Dq_plus_f0);
 
 	int ui = 0;
@@ -1165,6 +1167,33 @@ void ArapInteractor::OnDraw(int vp)
 		glTranslated(0, 0, -.01);
 	}
 
+	// Draw weight triangle
+
+	if (true) {
+		glTranslated(0, 0, .01);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glColor4f(.5f, .5f, .5f, 0.7f);
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+		int nt = fittedVertices.size();
+
+		glBegin(GL_TRIANGLES);
+		for (int i = 0; i < nt; i++) {
+			if (selectedTri[i]) {
+				glVertex2dv(themesh.vertices[themesh.tris[i][0]]);
+				glVertex2dv(themesh.vertices[themesh.tris[i][1]]);
+				glVertex2dv(themesh.vertices[themesh.tris[i][2]]);
+			}
+		}
+		glEnd();
+
+		glDisable(GL_BLEND);
+		glTranslated(0, 0, -.01);
+	}
+
 	// Draw the control points
 	glTranslated(0, 0, .1);
 	glLineWidth(2);
@@ -1194,7 +1223,7 @@ void ArapInteractor::OnMotion(int x, int y, int flag,bool mouse_down, int vp)
 {
 	Point2D pos = Point2D((double)x, (double)y);
 	
-	double thresh = 15.0;
+	double thresh = 30;
 	int detection;//°»´únormal¤Ï¦V
 	if (mouse_down) {
 		beingDragged = true;
@@ -1230,6 +1259,25 @@ int ArapInteractor::getVertex(int x, int y)
 			return i;
 	}
 	return -1;
+}
+void ArapInteractor::selectTriangle(int x, int y, int button)
+{
+	Point2D pos = Point2D((double)x, (double)y);
+	double thresh = 30.0;
+	int id = -1;
+	for (int i = 0; i < (int)themesh.tris.size(); i++) {
+		Point2D center = themesh.vertices[themesh.tris[i][0]];
+		center += themesh.vertices[themesh.tris[i][1]];
+		center += themesh.vertices[themesh.tris[i][2]];
+		center /= 3;
+		if (dist(center, pos) < thresh) {
+			id = i;
+			thresh = dist(center, pos);
+		}
+	}
+	if (id != -1) {
+		selectedTri[id] = button == 1;
+	}
 }
 void ArapInteractor::OnMouse(int button, int button_state, int x, int y, int vp)
 {
