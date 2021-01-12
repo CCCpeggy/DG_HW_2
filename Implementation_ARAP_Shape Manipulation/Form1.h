@@ -338,7 +338,7 @@ private: System::Void hkoglPanelControl1_MouseDown(System::Object^  sender, Syst
 	 }
 private: System::Void button2_Click_1(System::Object^  sender, System::EventArgs^  e) {//open image 
 		 Current_Display.openImg=1;
-		 ImageEdge->ReadImage("gingerbread_man.bmp");
+		 ImageEdge->ReadImage("full_guys_mask.png");
 		 *ImageEdge = (ImageEdge->CannyEdge());
 	 
 		 std::cout<<"Load img :"<<ImageEdge->GetHeight()<<"*"<<ImageEdge->GetWidth()<<std::endl;
