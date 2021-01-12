@@ -1387,6 +1387,15 @@ void ArapInteractor::OnMouse(int button, int button_state, int x, int y, int vp)
 	}
 }
 
+void ArapInteractor::AddControlPoints(int* flag, int size)
+{
+	for (int i = 0; i < size; i++) {
+		flags[flag[i]] = true;
+	}
+	preStep1();
+	preStep2();
+}
+
 void ArapInteractor::OnKeyboard(unsigned char key, int x, int y)
 {
 	if (key == '1')

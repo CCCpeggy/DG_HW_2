@@ -29,6 +29,7 @@ TriMesh2D* test_1 = NULL, *savedTest=NULL;
 ShapeView* ShapeView_Object = NULL;
 ArapInteractor* Arap = NULL;
 
+int		  *savedFlags = NULL, savedFlagSize = 0;
 int		  flag = -1;
 int		  mouseX, mouseY;
 bool isweightopen = false;
@@ -396,6 +397,11 @@ private: System::Void button2_Click_1(System::Object^ sender, System::EventArgs^
 
 		}
 		hkoglPanelControl1->Invalidate();
+		savedTest->vertices.resize(test_1->vertices.size(), Point2D(0, 0));
+		savedTest->tris.resize(test_1->tris.size(), Tri());
+		if (savedFlagSize) {
+			Arap->AddControlPoints(savedFlags, savedFlagSize);
+		}
 	}
 	private: System::Void fit_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
 		show_fitted = this->fit->Checked;
@@ -415,19 +421,19 @@ private: System::Void start_anime_Click(System::Object^ sender, System::EventArg
 		Arap->themesh.vertices[i][1] = savedTest->vertices[i][1];
 	}
 	hkoglPanelControl1->Invalidate();
+	animation = true;
 	for (int i = 0; i < actions.size(); i++) {
 		while (!Arap->OnMotion(actions[i].X, actions[i].Y, actions[i].flag, 1, 1)) {//0.008s
 			hkoglPanelControl1->Refresh();
 			Sleep(40);
 		}
 	}
+	animation = false;
 	hkoglPanelControl1->Invalidate();
 }
 private: System::Void record_anime_Click(System::Object^ sender, System::EventArgs^ e) {
 	actions.clear();
 	animation = true;
-	savedTest->vertices.resize(test_1->vertices.size(), Point2D(0, 0));
-	savedTest->tris.resize(test_1->tris.size(), Tri());
 	for (int i = 0; i < test_1->vertices.size(); i++)
 	{
 		savedTest->vertices[i][0] = Arap->themesh.vertices[i][0];
@@ -439,8 +445,66 @@ private: System::Void stop_anime_Click(System::Object^ sender, System::EventArgs
 	start_anime->Enabled = actions.size() > 0;
 	animation = false;
 	this->record_anime->ForeColor = this->start_anime->DefaultForeColor;
+	fstream file;
+	file.open("Animation.txt", ios::out);
+	file << test_1->vertices.size() << endl;
+	for (int i = 0; i < test_1->vertices.size(); i++)
+	{
+		file << savedTest->vertices[i][0] << " " << savedTest->vertices[i][1] << endl;
+	}
+
+	int count = 0;
+	for (int i = 0; i < Arap->flags.size(); i++) {
+		if (Arap->flags[i]) count++;
+	}
+	file << count;
+	for (int i = 0; i < Arap->flags.size(); i++) {
+		if (Arap->flags[i]) {
+			file << " " << i;
+		}
+	}
+	file << endl;
+
+	file << actions.size() << endl;
+	for (int i = 0; i < actions.size(); i++) {
+		file << actions[i].X << " " << actions[i].Y << " " << actions[i].flag << endl;
+	}
+	file.close();
 }
 private: System::Void Form1_Load(System::Object^ sender, System::EventArgs^ e) {
+	fstream file;
+	file.open("Animation.txt", ios::in);
+	if (!file.fail()) {
+		MoveAction newAction;
+		int count;
+		if (file >> count) {
+			savedTest->vertices.resize(count, Point2D(0, 0));
+			savedTest->tris.resize(count, Tri());
+			for (int i = 0; i < count; i++) {
+				double x, y;
+				file >> x >> y;
+				savedTest->vertices[i][0] = x;
+				savedTest->vertices[i][1] = y;
+			}
+		}
+		if (file >> count) {
+			savedFlags = new int[count];
+			savedFlagSize = count;
+			for (int i = 0; i < count; i++) {
+				file >> savedFlags[i];
+			}
+		}
+		if (file >> count) {
+			while (count--) {
+				file >> newAction.X >> newAction.Y >> newAction.flag;
+				actions.push_back(newAction);
+			}
+		}
+	}
+	for (int i = 0; i < actions.size(); i++) {
+		file << actions[i].X << " " << actions[i].Y << " " << actions[i].flag << endl;
+	}
+	file.close();
 	this->start_anime->Enabled = actions.size() > 0;
 }
 };
