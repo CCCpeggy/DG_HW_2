@@ -31,15 +31,17 @@ void TriMesh2D::draw(bool linemode)
 	//glColor3f(1.0, 0.0, 0.0);
 	if (linemode)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	else
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	else {
+		glBindTexture(GL_TEXTURE_2D, 1);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY_EXT);
+		glTexCoordPointer(2, GL_DOUBLE, 0, &uvs[0][0]);
+	}
 
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(2, GL_DOUBLE, sizeof(vertices[0]), &vertices[0][0]);
+	glVertexPointer(2, GL_DOUBLE, 0, &vertices[0][0]);
 
 	glDrawElements(GL_TRIANGLES, tris.size() * 3, GL_UNSIGNED_INT, (GLvoid*)tris[0]);
-
-
 }
 void TriMesh2D::compute_normal()
 {
@@ -1174,6 +1176,7 @@ void ArapInteractor::OnDraw(int vp)
 	glLineWidth(1);
 
 	glColor3f(.9f, .7f, .5f);
+	glColor3f(1.0f, 1.0f, 1.0f);
 
 	glTranslated(0, 0, -.01);
 	themesh.draw(false);

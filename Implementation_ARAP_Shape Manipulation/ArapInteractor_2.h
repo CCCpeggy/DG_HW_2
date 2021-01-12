@@ -479,6 +479,7 @@ class TriMesh2D
 {
 public:
 	vector<Point2D> vertices;
+	vector<Point2D> uvs;
 	vector<Tri> tris;
 	vector<int> normals;//1¥¿  -1­t
 

@@ -19,6 +19,7 @@
 #include "ArapInteractor_2.h"
 #include "vavImage.h"
 #include "TriangulationCgal.h"
+#include "Common.h"
 
 #pragma region Application variables
 
@@ -77,7 +78,6 @@ namespace As_rigid_as_test {
 			test_1 = new TriMesh2D;
 			savedTest = new TriMesh2D;
 			ImageEdge = new vavImage;
-			
 
 			//
 		}
@@ -348,8 +348,13 @@ namespace As_rigid_as_test {
 	}
 private: System::Void button2_Click_1(System::Object^ sender, System::EventArgs^ e) {//open image 
 		Current_Display.openImg = 1;
-		ImageEdge->ReadImage("full_guys_mask.png");
+		ImageEdge->ReadImage("full_guys_mask.png"); 
+		glEnable(GL_TEXTURE_2D);// 启用2D纹理
 		*ImageEdge = (ImageEdge->CannyEdge());
+
+		GLuint textureID;
+		loadTextures(textureID, "full_guys.png");
+		glBindTexture(GL_TEXTURE_2D, textureID);
 
 		std::cout << "Load img :" << ImageEdge->GetHeight() << "*" << ImageEdge->GetWidth() << std::endl;
 
@@ -376,6 +381,7 @@ private: System::Void button2_Click_1(System::Object^ sender, System::EventArgs^
 			for (int i = 0; i < meshPointset.size(); i++)
 			{
 				test_1->vertices.push_back(Point2D(meshPointset[i][0], meshPointset[i][1]));
+				test_1->uvs.push_back(Point2D(meshPointset[i][0] / ImageEdge->GetHeight(), 1 - meshPointset[i][1] / ImageEdge->GetWidth()));
 			}
 
 			Tris = Triangulate->GetTriangles();
