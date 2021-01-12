@@ -1219,7 +1219,7 @@ void ArapInteractor::OnDrawInfo(int vp)
 {
 }
 
-void ArapInteractor::OnMotion(int x, int y, int flag,bool mouse_down, int vp)
+bool ArapInteractor::OnMotion(int x, int y, int flag,bool mouse_down, int vp)
 {
 	Point2D pos = Point2D((double)x, (double)y);
 	
@@ -1228,24 +1228,34 @@ void ArapInteractor::OnMotion(int x, int y, int flag,bool mouse_down, int vp)
 	if (mouse_down) {
 		beingDragged = true;
 		// setup constraint
-		themesh.vertices[flag] = pos;
+		Point2D vertex = themesh.vertices[flag];
+		Point2D distance = pos - vertex;
+		double disLength = sqrt(distance[0] * distance[0] + distance[1] * distance[1]);
+		if (disLength == 0) return true;
+		int times = animation ? disLength / 15 + 1 : 1;
+		Point2D step = Point2D(distance[0] / times, distance[1] / times);
+
+		vertex += step;
+		themesh.vertices[flag] = vertex;
 		deform();
 
-		if(!themesh.normal_detection())//normal不會反向
+		if (!themesh.normal_detection())//normal不會反向
 		{
-			for(int i=0;i<themesh.vertices.size();i++)
+			for (int i = 0; i < themesh.vertices.size(); i++)
 			{
-				savelastFlagsPosition[i]=themesh.vertices[i];
-			}			
+				savelastFlagsPosition[i] = themesh.vertices[i];
+			}
+			return false;
 		}
 		else
 		{
-			for(int i=0;i<themesh.vertices.size();i++)
+			for (int i = 0; i < themesh.vertices.size(); i++)
 			{
-				themesh.vertices[i]=savelastFlagsPosition[i];
+				themesh.vertices[i] = savelastFlagsPosition[i];
 			}
 		}
 	}
+	return true;
 }
 int ArapInteractor::getVertex(int x, int y)
 {	

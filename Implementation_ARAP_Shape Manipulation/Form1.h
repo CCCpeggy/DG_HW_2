@@ -1,4 +1,4 @@
-//==========================================================================
+﻿//==========================================================================
 //  This is the implementation of As-Rigid-As-Possible Shape Manipulation
 //==========================================================================
 #pragma once
@@ -24,7 +24,7 @@
 vavImage	  *ImageEdge=NULL;	   //find contour
 TriangulationCgal *Triangulate=NULL;	   //Delaunay triangulation	
 
-TriMesh2D	  *test_1=NULL;		   	
+TriMesh2D	  *test_1=NULL, *savedTest=NULL;		   	
 ShapeView	  *ShapeView_Object=NULL;
 ArapInteractor    *Arap=NULL;
 
@@ -43,6 +43,13 @@ struct Mode_Display {
 };
 
 Mode_Display Current_Display;
+
+struct MoveAction {
+	int flag;
+	int X;
+	int Y;
+};
+std::vector<MoveAction> actions;
 #pragma endregion
 
 namespace As_rigid_as_test {
@@ -66,6 +73,7 @@ namespace As_rigid_as_test {
 			//
 			//TODO: Add the constructor code here
 			test_1 = new TriMesh2D;
+			savedTest = new TriMesh2D;
 			ImageEdge= new vavImage;
 			
 
@@ -90,7 +98,7 @@ namespace As_rigid_as_test {
 
 	private: System::Windows::Forms::Button^  button2;
 	private: System::Windows::Forms::Button^  button3;
-	private: System::Windows::Forms::Button^ animation;
+
 
 	private: System::Windows::Forms::CheckBox^ depth;
 	private: System::Windows::Forms::CheckBox^ weight;
@@ -98,6 +106,11 @@ namespace As_rigid_as_test {
 	private: System::Windows::Forms::CheckBox^ peekinginterface;
 	private: System::Windows::Forms::CheckBox^ Scale;
 	private: System::Windows::Forms::CheckBox^ fit;
+	private: System::Windows::Forms::Button^ start_anime;
+	private: System::Windows::Forms::Button^ record_anime;
+	private: System::Windows::Forms::Button^ stop_anime;
+
+
 
 
 	private: System::ComponentModel::IContainer^  components;
@@ -120,13 +133,15 @@ namespace As_rigid_as_test {
 			this->hkoglPanelControl1 = (gcnew HKOGLPanel::HKOGLPanelControl());
 			this->button2 = (gcnew System::Windows::Forms::Button());
 			this->button3 = (gcnew System::Windows::Forms::Button());
-			this->animation = (gcnew System::Windows::Forms::Button());
 			this->depth = (gcnew System::Windows::Forms::CheckBox());
 			this->weight = (gcnew System::Windows::Forms::CheckBox());
 			this->curve = (gcnew System::Windows::Forms::CheckBox());
 			this->peekinginterface = (gcnew System::Windows::Forms::CheckBox());
 			this->Scale = (gcnew System::Windows::Forms::CheckBox());
 			this->fit = (gcnew System::Windows::Forms::CheckBox());
+			this->start_anime = (gcnew System::Windows::Forms::Button());
+			this->record_anime = (gcnew System::Windows::Forms::Button());
+			this->stop_anime = (gcnew System::Windows::Forms::Button());
 			this->SuspendLayout();
 			// 
 			// hkoglPanelControl1
@@ -136,13 +151,13 @@ namespace As_rigid_as_test {
 			hkcoglPanelCameraSetting1->Near = -1000;
 			hkcoglPanelCameraSetting1->Type = HKOGLPanel::HKCOGLPanelCameraSetting::CAMERATYPE::ORTHOGRAPHIC;
 			this->hkoglPanelControl1->Camera_Setting = hkcoglPanelCameraSetting1;
-			this->hkoglPanelControl1->Location = System::Drawing::Point(136, 13);
+			this->hkoglPanelControl1->Location = System::Drawing::Point(172, 13);
 			this->hkoglPanelControl1->Name = L"hkoglPanelControl1";
 			hkcoglPanelPixelFormat1->Accumu_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
 			hkcoglPanelPixelFormat1->Alpha_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
 			hkcoglPanelPixelFormat1->Stencil_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
 			this->hkoglPanelControl1->Pixel_Format = hkcoglPanelPixelFormat1;
-			this->hkoglPanelControl1->Size = System::Drawing::Size(734, 682);
+			this->hkoglPanelControl1->Size = System::Drawing::Size(800, 682);
 			this->hkoglPanelControl1->TabIndex = 9;
 			this->hkoglPanelControl1->Load += gcnew System::EventHandler(this, &Form1::hkoglPanelControl1_Load);
 			this->hkoglPanelControl1->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &Form1::hkoglPanelControl1_Paint);
@@ -154,7 +169,7 @@ namespace As_rigid_as_test {
 			// 
 			this->button2->Location = System::Drawing::Point(12, 13);
 			this->button2->Name = L"button2";
-			this->button2->Size = System::Drawing::Size(118, 107);
+			this->button2->Size = System::Drawing::Size(126, 107);
 			this->button2->TabIndex = 11;
 			this->button2->Text = L"Open Img";
 			this->button2->UseVisualStyleBackColor = true;
@@ -164,25 +179,16 @@ namespace As_rigid_as_test {
 			// 
 			this->button3->Location = System::Drawing::Point(12, 135);
 			this->button3->Name = L"button3";
-			this->button3->Size = System::Drawing::Size(118, 114);
+			this->button3->Size = System::Drawing::Size(126, 114);
 			this->button3->TabIndex = 12;
 			this->button3->Text = L"triangulation";
 			this->button3->UseVisualStyleBackColor = true;
 			this->button3->Click += gcnew System::EventHandler(this, &Form1::button3_Click);
 			// 
-			// animation
-			// 
-			this->animation->Location = System::Drawing::Point(13, 255);
-			this->animation->Name = L"animation";
-			this->animation->Size = System::Drawing::Size(117, 46);
-			this->animation->TabIndex = 13;
-			this->animation->Text = L"animation";
-			this->animation->UseVisualStyleBackColor = true;
-			// 
 			// depth
 			// 
 			this->depth->AutoSize = true;
-			this->depth->Location = System::Drawing::Point(12, 380);
+			this->depth->Location = System::Drawing::Point(13, 413);
 			this->depth->Name = L"depth";
 			this->depth->Size = System::Drawing::Size(50, 16);
 			this->depth->TabIndex = 15;
@@ -192,7 +198,7 @@ namespace As_rigid_as_test {
 			// weight
 			// 
 			this->weight->AutoSize = true;
-			this->weight->Location = System::Drawing::Point(13, 349);
+			this->weight->Location = System::Drawing::Point(13, 378);
 			this->weight->Name = L"weight";
 			this->weight->Size = System::Drawing::Size(55, 16);
 			this->weight->TabIndex = 16;
@@ -202,7 +208,7 @@ namespace As_rigid_as_test {
 			// curve
 			// 
 			this->curve->AutoSize = true;
-			this->curve->Location = System::Drawing::Point(12, 415);
+			this->curve->Location = System::Drawing::Point(12, 449);
 			this->curve->Name = L"curve";
 			this->curve->Size = System::Drawing::Size(50, 16);
 			this->curve->TabIndex = 17;
@@ -212,7 +218,7 @@ namespace As_rigid_as_test {
 			// peekinginterface
 			// 
 			this->peekinginterface->AutoSize = true;
-			this->peekinginterface->Location = System::Drawing::Point(13, 452);
+			this->peekinginterface->Location = System::Drawing::Point(12, 481);
 			this->peekinginterface->Name = L"peekinginterface";
 			this->peekinginterface->Size = System::Drawing::Size(104, 16);
 			this->peekinginterface->TabIndex = 18;
@@ -224,7 +230,7 @@ namespace As_rigid_as_test {
 			this->Scale->AutoSize = true;
 			this->Scale->Checked = true;
 			this->Scale->CheckState = System::Windows::Forms::CheckState::Checked;
-			this->Scale->Location = System::Drawing::Point(82, 316);
+			this->Scale->Location = System::Drawing::Point(82, 346);
 			this->Scale->Name = L"Scale";
 			this->Scale->Size = System::Drawing::Size(46, 16);
 			this->Scale->TabIndex = 19;
@@ -235,7 +241,7 @@ namespace As_rigid_as_test {
 			// fit
 			// 
 			this->fit->AutoSize = true;
-			this->fit->Location = System::Drawing::Point(13, 316);
+			this->fit->Location = System::Drawing::Point(13, 346);
 			this->fit->Name = L"fit";
 			this->fit->Size = System::Drawing::Size(61, 16);
 			this->fit->TabIndex = 14;
@@ -243,36 +249,64 @@ namespace As_rigid_as_test {
 			this->fit->UseVisualStyleBackColor = true;
 			this->fit->CheckedChanged += gcnew System::EventHandler(this, &Form1::fit_CheckedChanged);
 			// 
+			// start_anime
+			// 
+			this->start_anime->Enabled = actions.size() > 0;
+			this->start_anime->Font = (gcnew System::Drawing::Font(L"新細明體", 15));
+			this->start_anime->Location = System::Drawing::Point(12, 271);
+			this->start_anime->Name = L"start_anime";
+			this->start_anime->Size = System::Drawing::Size(38, 35);
+			this->start_anime->TabIndex = 20;
+			this->start_anime->Text = L"▶";
+			this->start_anime->UseVisualStyleBackColor = true;
+			this->start_anime->Click += gcnew System::EventHandler(this, &Form1::start_anime_Click);
+			// 
+			// record_anime
+			// 
+			this->record_anime->Font = (gcnew System::Drawing::Font(L"新細明體", 10));
+			this->record_anime->Location = System::Drawing::Point(56, 271);
+			this->record_anime->Name = L"record_anime";
+			this->record_anime->Size = System::Drawing::Size(38, 35);
+			this->record_anime->TabIndex = 21;
+			this->record_anime->Text = L"⚫";
+			this->record_anime->UseVisualStyleBackColor = true;
+			this->record_anime->Click += gcnew System::EventHandler(this, &Form1::record_anime_Click);
+			// 
+			// stop_anime
+			// 
+			this->stop_anime->Font = (gcnew System::Drawing::Font(L"新細明體", 8));
+			this->stop_anime->Location = System::Drawing::Point(100, 271);
+			this->stop_anime->Name = L"stop_anime";
+			this->stop_anime->Size = System::Drawing::Size(38, 35);
+			this->stop_anime->TabIndex = 22;
+			this->stop_anime->Text = L"█";
+			this->stop_anime->UseVisualStyleBackColor = true;
+			this->stop_anime->Click += gcnew System::EventHandler(this, &Form1::stop_anime_Click);
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 12);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(887, 707);
+			this->ClientSize = System::Drawing::Size(1011, 707);
+			this->Controls->Add(this->stop_anime);
+			this->Controls->Add(this->record_anime);
+			this->Controls->Add(this->start_anime);
 			this->Controls->Add(this->Scale);
 			this->Controls->Add(this->peekinginterface);
 			this->Controls->Add(this->curve);
 			this->Controls->Add(this->weight);
 			this->Controls->Add(this->depth);
 			this->Controls->Add(this->fit);
-			this->Controls->Add(this->animation);
 			this->Controls->Add(this->button3);
 			this->Controls->Add(this->button2);
 			this->Controls->Add(this->hkoglPanelControl1);
 			this->Name = L"Form1";
 			this->Text = L"As rigid as possible shape manipulation";
-			this->Load += gcnew System::EventHandler(this, &Form1::Form1_Load);
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
 		}
 #pragma endregion
-	private: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e) {
-		 }
-	private: System::Void dotNetBarManager1_ItemClick(System::Object^  sender, System::EventArgs^  e) {
-		 }
-private: System::Void button1_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-		 hkoglPanelControl1->Invalidate();
-	 }
 private: System::Void hkoglPanelControl1_Paint(System::Object^  sender, System::Windows::Forms::PaintEventArgs^  e) {
 		 Render_Init(hkoglPanelControl1->Size.Width, hkoglPanelControl1->Size.Height);
 		 if(Current_Display.openImg)
@@ -298,13 +332,16 @@ private: System::Void hkoglPanelControl1_MouseMove(System::Object^  sender, Syst
 // 				 clock_t start, finish;
 // 				 start = clock();
 				 //==========================
-				 Arap->OnMotion(e->X-50,e->Y-50,flag,1,1);//0.008s
-
+				 while (!Arap->OnMotion(e->X - 50, e->Y - 50, flag, 1, 1)) {//0.008s
+					 hkoglPanelControl1->Refresh();
+				 }
+				 hkoglPanelControl1->Invalidate();
+				 MoveAction newAction = { flag, e->X - 50, e->Y - 50 };
+				 actions.push_back(newAction);
 				 //==============================
 // 				 finish = clock();
 // 				 cout <<"Time Consume :" <<(double)(finish - start) / CLOCKS_PER_SEC<<endl;
 				 //==============================
-				 hkoglPanelControl1->Invalidate();
 			 }
 			 else {
 				 Arap->selectTriangle(e->X - 50, e->Y - 50, 1);
@@ -395,6 +432,37 @@ private: System::Void fit_CheckedChanged(System::Object^ sender, System::EventAr
 private: System::Void Scale_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
 	Arap->OnKeyboard('1',1,1 );
 	step1_only = !this->Scale->Checked;
+}
+
+private: System::Void start_anime_Click(System::Object^ sender, System::EventArgs^ e) {
+	for (int i = 0; i < test_1->vertices.size(); i++)
+	{
+		Arap->themesh.vertices[i][0] = savedTest->vertices[i][0];
+		Arap->themesh.vertices[i][1] = savedTest->vertices[i][1];
+	}
+	hkoglPanelControl1->Invalidate();
+	for (int i = 0; i < actions.size(); i++) {
+		while (!Arap->OnMotion(actions[i].X, actions[i].Y, actions[i].flag, 1, 1)) {//0.008s
+			hkoglPanelControl1->Refresh();
+			Sleep(50);
+		}
+	}
+	hkoglPanelControl1->Invalidate();
+}
+private: System::Void record_anime_Click(System::Object^ sender, System::EventArgs^ e) {
+	actions.clear();
+	animation = true;
+	savedTest->vertices.resize(test_1->vertices.size(), Point2D(0, 0));
+	savedTest->tris.resize(test_1->tris.size(), Tri());
+	for (int i = 0; i < test_1->vertices.size(); i++)
+	{
+		savedTest->vertices[i][0] = Arap->themesh.vertices[i][0];
+		savedTest->vertices[i][1] = Arap->themesh.vertices[i][1];
+	}
+}
+private: System::Void stop_anime_Click(System::Object^ sender, System::EventArgs^ e) {
+	start_anime->Enabled = actions.size() > 0;
+	animation = false;
 }
 };
 }

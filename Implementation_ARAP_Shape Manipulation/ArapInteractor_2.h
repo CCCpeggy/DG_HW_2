@@ -470,6 +470,7 @@ class ArapInteractor
 	ShapeView* shapeview;
 	vector<Point2D> savelastFlagsPosition;
 	vector<Point2D> boundary;
+public: 
 	TriMesh2D themesh;
 	vector<Point2D> baseVertices;
 	vector<bool> selectedTri;
@@ -518,7 +519,7 @@ public:
 	void OnDraw(int vp = -1);
 	void OnDisplay();
 	void OnDrawInfo(int vp = -1);
-	void OnMotion(int x, int y, int flag,bool mouse_down=0, int vp = -1);
+	bool OnMotion(int x, int y, int flag,bool mouse_down=0, int vp = -1);
 	void OnMouse(int button, int button_state, int x, int y, int vp = -1);
 	void OnKeyboard(unsigned char key, int x, int y);
 	void OnSpecialKey(int key, int x, int y);
