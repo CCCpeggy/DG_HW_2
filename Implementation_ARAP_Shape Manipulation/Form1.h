@@ -36,7 +36,7 @@ int		  mouseX, mouseY;
 bool isweightopen = false;
 extern bool step1_only;
 extern bool show_fitted;
-extern bool depth;
+extern bool doDepth;
 extern bool animation;
 extern bool peeking;
 
@@ -188,6 +188,7 @@ namespace As_rigid_as_test {
 			this->depth->TabIndex = 15;
 			this->depth->Text = L"depth";
 			this->depth->UseVisualStyleBackColor = true;
+			this->depth->CheckedChanged += gcnew System::EventHandler(this, &Form1::depth_CheckedChanged);
 			// 
 			// weight
 			// 
@@ -248,6 +249,7 @@ namespace As_rigid_as_test {
 			// 
 			// stop_anime
 			// 
+			this->stop_anime->Enabled = false;
 			this->stop_anime->Font = (gcnew System::Drawing::Font(L"新細明體", 8));
 			this->stop_anime->Location = System::Drawing::Point(100, 271);
 			this->stop_anime->Name = L"stop_anime";
@@ -405,9 +407,6 @@ private: System::Void button2_Click_1(System::Object^ sender, System::EventArgs^
 		hkoglPanelControl1->Invalidate();
 		savedTest->vertices.resize(test_1->vertices.size(), Point2D(0, 0));
 		savedTest->tris.resize(test_1->tris.size(), Tri());
-		if (savedFlagSize) {
-			Arap->AddControlPoints(savedFlags, savedFlagSize);
-		}
 	}
 	private: System::Void fit_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
 		show_fitted = this->fit->Checked;
@@ -421,6 +420,9 @@ private: System::Void button2_Click_1(System::Object^ sender, System::EventArgs^
 	}
 
 private: System::Void start_anime_Click(System::Object^ sender, System::EventArgs^ e) {
+	if (savedFlagSize) {
+		Arap->ResetControlPoints(savedFlags, savedFlagSize);
+	}
 	for (int i = 0; i < test_1->vertices.size(); i++)
 	{
 		Arap->themesh.vertices[i][0] = savedTest->vertices[i][0];
@@ -438,6 +440,8 @@ private: System::Void start_anime_Click(System::Object^ sender, System::EventArg
 	hkoglPanelControl1->Invalidate();
 }
 private: System::Void record_anime_Click(System::Object^ sender, System::EventArgs^ e) {
+	this->record_anime->ForeColor = Color::Red;
+	this->stop_anime->Enabled = true;
 	actions.clear();
 	animation = true;
 	for (int i = 0; i < test_1->vertices.size(); i++)
@@ -445,12 +449,13 @@ private: System::Void record_anime_Click(System::Object^ sender, System::EventAr
 		savedTest->vertices[i][0] = Arap->themesh.vertices[i][0];
 		savedTest->vertices[i][1] = Arap->themesh.vertices[i][1];
 	}
-	this->record_anime->ForeColor = Color::Red;
 }
 private: System::Void stop_anime_Click(System::Object^ sender, System::EventArgs^ e) {
-	start_anime->Enabled = actions.size() > 0;
-	animation = false;
+	this->stop_anime->Enabled = false;
 	this->record_anime->ForeColor = this->start_anime->DefaultForeColor;
+	this->start_anime->Enabled = actions.size() > 0;
+	animation = false;
+	savedFlagSize = 0;
 	fstream file;
 	file.open("Animation.txt", ios::out);
 	file << test_1->vertices.size() << endl;
@@ -512,6 +517,9 @@ private: System::Void Form1_Load(System::Object^ sender, System::EventArgs^ e) {
 	}
 	file.close();
 	this->start_anime->Enabled = actions.size() > 0;
+}
+private: System::Void depth_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
+	doDepth = this->depth->Checked;
 }
 };
 }

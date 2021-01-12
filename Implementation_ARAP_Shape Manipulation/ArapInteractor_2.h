@@ -548,7 +548,7 @@ public:
 	void OnDrawInfo(int vp = -1);
 	bool OnMotion(int x, int y, int flag, bool mouse_down = 0, int vp = -1);
 	void OnMouse(int button, int button_state, int x, int y, int vp = -1);
-	void AddControlPoints(int* flag, int size);
+	void ResetControlPoints(int* flag, int size);
 	void OnKeyboard(unsigned char key, int x, int y);
 	void OnSpecialKey(int key, int x, int y);
 

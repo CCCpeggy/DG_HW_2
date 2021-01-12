@@ -18,7 +18,7 @@ using namespace std;
 
 bool step1_only = false;
 bool show_fitted = false;
-bool depth = false;
+bool doDepth = false;
 bool animation = false;
 bool peeking = false;
 bool isWeight = false;
@@ -37,9 +37,21 @@ void TriMesh2D::draw(bool linemode)
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY_EXT);
 		glTexCoordPointer(2, GL_DOUBLE, 0, &uvs[0][0]);
 	}
-
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(2, GL_DOUBLE, 0, &vertices[0][0]);
+	if (!doDepth) {
+		glVertexPointer(2, GL_DOUBLE, 0, &vertices[0][0]);
+	}
+	else {
+		vector<vector<double>> tmpVertices;
+		for (int i = 0; i < vertices.size(); i++) {
+			vector<double> tmp;
+			tmp.push_back(vertices[i][0]);
+			tmp.push_back(vertices[i][1]);
+			tmp.push_back(vertices[i][0] * 0.0001 + vertices[i][1] * 0.00002);
+			tmpVertices.push_back(tmp);
+		}
+		glVertexPointer(3, GL_DOUBLE, 0, &tmpVertices[0][0]);
+	}
 
 	glDrawElements(GL_TRIANGLES, tris.size() * 3, GL_UNSIGNED_INT, (GLvoid*)tris[0]);
 }
@@ -1390,8 +1402,11 @@ void ArapInteractor::OnMouse(int button, int button_state, int x, int y, int vp)
 	}
 }
 
-void ArapInteractor::AddControlPoints(int* flag, int size)
+void ArapInteractor::ResetControlPoints(int* flag, int size)
 {
+	for (int i = 0; i < flags.size(); i++) {
+		flags[i] = false;
+	}
 	for (int i = 0; i < size; i++) {
 		flags[flag[i]] = true;
 	}
